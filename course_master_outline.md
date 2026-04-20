@@ -23,7 +23,8 @@ Consequences of this choice:
 | Choice | Rationale |
 |---|---|
 | Minimal math notation | Audience ≠ ML researchers. Use notation only where it genuinely unlocks something. Prefer "the model computes a weighted average over previous tokens" to `softmax(QK^T/√d_k)V` unless the latter is load-bearing. |
-| Generic examples, Google callouts | Course ages better when generic; Google callouts land when attendees can connect to products they know. Frame Gemini specifics as "known" or "widely speculated" — do not overclaim. Every Gemini claim passes through two gates: the one-pass verification sweep (§10.1, pre-production) and the per-session fact-check stage (§10.2, post-artifact). |
+| Generic examples, Google callouts | Course ages better when generic; Google callouts land when attendees can connect to products they know. Frame Gemini specifics as "known" or "widely speculated" — do not overclaim. Every Gemini claim passes through two gates: the one-pass verification sweep (§10.1, pre-production) and the week-of revalidation (§10.2, just before delivery). |
+| Durability-first content | Bulk of every session lives in fundamentals with a 5–10+ year half-life: residual stream, attention math, prefill/decode asymmetry, the agent loop. Vendor specifics, model names, benchmark numbers, and SOTA highlights are kept thin and *isolatable* — they live in their own slides/segments so they can be refreshed without restructuring the session. Reason: LLM-specifics have a half-life of months; structuring the course around them guarantees rot. Operationalized through three layers — durable fundamentals, week-of revalidation (§10.2), and a recent-SOTA callout segment per session (§10.3). |
 | One SRE callout per session | Concrete operational tie-in, not shoehorned. Sessions 6–7 are SRE-rich; sessions 4–5 have thinner callouts. That is fine. |
 | Interactive HTML where useful | Clickable walkthroughs for things that benefit from them — tokenizer visualizer, attention viewer, prefill/decode timeline. Not every session needs one. |
 | Pre-read primes questions, not answers | Attendees arrive with mental hooks, not half-formed answers that have to be un-taught. Each pre-read explicitly plants 1–3 questions the session will resolve. |
@@ -604,7 +605,8 @@ The pre-read offers a paragraph of intuition for each and explicitly says "we'll
 |---|---|
 | Attendee frustration with theory-first | Acknowledge explicitly in session 1. Promise the payoff. Refer forward often. |
 | Math anxiety | Minimal notation. Never use Greek letters without introducing them. |
-| "Gemini does X" overclaim | Always hedge non-public architecture details as "widely believed" or "speculated." Enforcement isn't vibes — §10.1 is a mandatory one-pass web-grounded sweep over every Gemini claim in the outline before session production begins, §10.2 is a mandatory per-session fact-check with sources after artifacts are drafted. Both gates produce paper trails. |
+| "Gemini does X" overclaim | Always hedge non-public architecture details as "widely believed" or "speculated." Enforcement isn't vibes — §10.1 is a mandatory one-pass web-grounded sweep over every Gemini claim before session production begins, §10.2 is a mandatory week-of revalidation per session. Both gates produce dated paper trails. |
+| Content goes stale between drafting and delivery | Three-layer defense (§10): (1) durability-first content principle (§2) keeps the body in 5–10+ year fundamentals; (2) week-of revalidation (§10.2) catches drift in the time-sensitive claims that remain; (3) a per-session "Recent SOTA callout" segment (§10.3) isolates the frontier-news content into a single hot-swappable slide block. |
 | Facilitator gap exposed by a sharp question | "Let me get back to you" is fine. Study prompts minimize but don't eliminate this. |
 | Running out of time | Pre-identify a cuttable 5-min segment per session. |
 | Q&A derails | 15-min Q&A with parking-lot flip chart. Facilitator's guide flags on-topic vs. next-session vs. out-of-scope. |
@@ -627,24 +629,27 @@ For personal prep beyond attendee level:
 
 Before each session, produce:
 
-- [ ] Slide deck (HTML-interactive where applicable)
+- [ ] Slide deck (HTML-interactive where applicable) — includes a dedicated **Recent SOTA callout** segment (see §10.3)
 - [ ] Facilitator's guide (annotated slides with speaker notes, expected questions, traps)
 - [ ] Pre-read (1,000–1,500 words, primes questions not answers)
 - [ ] Study prompt (paste-ready for Claude, adaptive, covers session + cumulative)
-- [ ] **Fact-check report** (web-grounded, sourced; see §10 for workflow)
+- [ ] **Fact-check report** (week-of, web-grounded, sourced; see §10.2 for workflow)
 
 *Not in this document: the five deliverables themselves. Those are produced session by session, starting with session 1.*
 
-## 10. Fact-Checking Workflow
+## 10. Fact-Checking and Currency Workflow
 
-Two distinct fact-checking activities, both web-grounded:
+Three layers of defense against staleness and overclaims, working together:
 
 **10.1 One-pass Gemini verification (whole-outline, done once before deliverables begin).**
-Every Gemini-specific claim currently in the outline is hedged from facilitator memory. Run a single web-research pass that produces a sources-table covering: TPU generations used (training and serving), tokenizer family, context window specifics, function calling / tool use, MoE status (confirmed vs widely-believed vs speculation), AgentSpace / Vertex AI agent tooling, multimodal support, anything else the outline asserts. Output: a markdown table with claim → status (confirmed / widely-believed / speculation / outdated) → source(s) → corrected hedging language. Used to recalibrate every Gemini callout during the per-session rewrite, and serves as facilitator-training material — Bryan is at Google, but knowing what the *external* world has and hasn't published is the relevant frame for an attendee-facing course.
+Every Gemini-specific claim currently in the outline is hedged from facilitator memory. Run a single web-research pass that produces a sources-table covering: TPU generations used (training and serving), tokenizer family, context window specifics, function calling / tool use, MoE status (confirmed vs widely-believed vs speculation), AgentSpace / Vertex AI agent tooling, multimodal support, anything else the outline asserts. Output: a markdown table with claim → status (confirmed / widely-believed / speculation / outdated) → source(s) → corrected hedging language → **last-verified date**. Used to recalibrate every Gemini callout during the per-session rewrite, and serves as facilitator-training material. Snapshot the date this sweep is performed; entries older than ~60 days at delivery time, or any entry where the underlying vendor has shipped a relevant release since, must be re-checked in §10.2.
 
-**10.2 Per-session fact-check pass (after each session's artifacts are created).**
-After slide deck, facilitator's guide, pre-read, and study prompt are drafted for a session, run a focused web-grounded fact-check. Scope: every factual claim in the artifacts — model specs, paper attributions, dates, benchmark numbers, vendor capabilities, infrastructure details, technique provenance. Output: a fact-check report listing each claim, verification status, source URL(s), and any required corrections. Required for each session before delivery. The point is not skepticism for its own sake — it's that overclaims to a Google SRE audience erode credibility for the rest of the course.
+**10.2 Week-of revalidation (per session, the week before delivery).**
+Timing matters: this is not "after artifacts are drafted" but "the week of presentation." Scope: every time-sensitive factual claim in the session's artifacts — model specs, version numbers, benchmark figures, vendor capabilities, context window sizes, pricing, anything that could have moved since drafting. Cross-reference against the §10.1 ledger (any claim past its 60-day window or with a vendor release in the interim gets re-checked). Output: an updated fact-check report listing each claim, verification status, source URL(s), corrections applied, and a fresh last-verified date. Required gate before delivery. The point is not skepticism for its own sake — it's that overclaims to a Google SRE audience erode credibility for the rest of the course.
+
+**10.3 Recent SOTA callout (per session, content slot).**
+Each session includes an explicit segment — typically 2–4 minutes, placed where it fits the narrative — covering relevant SOTA developments from the **last week to month**. Examples: a model release that bumps a benchmark covered in the session, a paper that complicates or confirms a claim, a serving-stack improvement that changes the cost math. Compiled the same week as §10.2 revalidation (same research swing). Lives in its own slide(s) so it can be hot-swapped without touching surrounding material. Signals that the course tracks the field; keeps fundamentals-first content from feeling frozen-in-amber.
 
 **Sourcing standards:** primary sources first (vendor docs, technical reports, papers), reputable secondary second (well-cited blog posts, conference talks). Avoid LLM-generated summaries as sources. When a claim is "widely believed" but unconfirmed, name the believers (which labs / which credible analysts).
 
-**Decision log — fact-checking workflow (2026-04-20):** Added §10 and the 5th deliverable. Reason: the outline currently hedges Gemini claims from facilitator memory, and the audience is Google SREs who will catch overclaims. One-pass verification fixes the existing outline's claims; per-session fact-check prevents new ones from sneaking in. The verification pass also doubles as facilitator training — understanding the external-vs-internal information asymmetry is itself useful for someone teaching this course.
+**Decision log — fact-checking workflow (2026-04-20):** Three-layer staleness defense. Added §10 and the 5th deliverable. Reason: outline hedges Gemini claims from facilitator memory; audience is Google SREs who will catch overclaims; LLM-specifics rot fast. The strategy is durability + week-of revalidation + explicit "what's new" segment. Layer 1 (one-pass) fixes the existing outline's claims and produces a dated ledger. Layer 2 (week-of) catches drift just before delivery and is timed deliberately late so it captures last-minute releases. Layer 3 (SOTA callout) inverts the staleness problem — instead of trying to keep the body fresh, isolate freshness into its own slot where it belongs. Together with the durability-first content principle (§2), the course's body ages slowly and the dated parts are clearly marked as such.
