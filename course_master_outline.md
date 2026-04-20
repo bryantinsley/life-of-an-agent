@@ -120,16 +120,20 @@ The two phases of a single inference request. Different bottlenecks, different o
 
 ### Session 1 — Foundations I: From Text to Vectors
 
-**One-line goal:** Attendees leave understanding that an LLM is a function from a token sequence to a probability distribution over the next token, and know how text becomes numbers.
+**One-line goal (technical):** Attendees leave understanding that an LLM is a function from a token sequence to a probability distribution over the next token, and know how text becomes numbers.
+
+**One-line goal (experiential — equally important):** Attendees walk out thinking *"I learned a lot, and I can't wait for next week."* S1 sets the tone for retention across the whole course. It needs to feel busy with novelty, not exhausting.
 
 **Position in arc:** Foundation of everything. The agent-loop preview (first 10 min) is a promise; the real work is the second half.
 
+**Delivery principle:** Visual-first. Slides should be sparse text + dense interactive demos. Four load-bearing click-throughs (see "Interactive HTML — required" below) carry the session; bullets are scaffolding, not the substance. If an interactive is cut for time, the whole session weakens — they are the pedagogy, not embellishment.
+
 **Time breakdown (45 min):**
-- 0–10: Agent loop at 10,000 feet. What we're ultimately explaining. Promise: "by session 10 you'll understand every layer of this."
-- 10–15: Architecture and inference map. What a model file is. What a forward pass is. Training vs. inference, one sentence each. No depth — just the map.
-- 15–25: Tokenization. Why we tokenize, BPE intuition, tokenizer quirks, why tokens aren't words.
-- 25–35: Embeddings. Lookup table, vectors, "similar meanings live near each other" intuition.
-- 35–45: The residual stream. One vector per token, updated as we go through layers. Preview: "attention and FFN layers read and write this stream."
+- 0–10: **Agent loop demo (interactive #1).** Click through one real turn — model thinks, emits a tool call, harness dispatches, result comes back, model continues. Promise: "by session 10 you'll understand every layer of what just happened."
+- 10–15: Architecture and inference map. The single canonical diagram they'll see all course long. Training vs. inference, one sentence each. No depth — just the map. Worth dwelling on the diagram itself; this is their navigation aid for ten weeks.
+- 15–25: Tokenization. **Live tokenizer (interactive #2)** — paste their own name, emoji, code, Mandarin, the BPE merging visualizer on a toy vocab. Why tokens aren't words has to be felt, not told.
+- 25–35: Embeddings. **2D embedding scatter (interactive #3)** — projected word cluster, hover/zoom, with the "king − man + woman ≈ queen" demo as pull-out. "Similar meanings live near each other" should be visible, not asserted.
+- 35–45: The residual stream. **Residual-stream animator (interactive #4)** — one token position, watch its vector evolve layer by layer toward a prediction. This is the prime for S2: "next week we'll explain how the layer decided what to add."
 
 **Learning objectives:**
 - Describe what a token is and why tokenization affects behavior (cost, edge cases, non-English).
@@ -160,7 +164,14 @@ The two phases of a single inference request. Different bottlenecks, different o
 
 **Google/Gemini callout:** Gemini uses a SentencePiece-family tokenizer; some details are public. Worth naming, not worth dwelling on.
 
-**Interactive HTML opportunity:** Live tokenizer visualizer. Paste text, see tokens with boundaries and ids, see per-token cost estimate. Can fake with a small BPE on a toy vocabulary to show the merging intuition.
+**Interactive HTML — required (four pieces):**
+
+1. **Agent loop demo (0–10 min):** A pre-recorded or live click-through of one full agent turn — user message → model thinking → tool call emission → harness dispatch → tool result → next model turn. Should look impressive without needing explanation; the wow is "this is what we're going to take apart."
+2. **Tokenizer visualizer (15–25 min):** Live paste, see tokens with boundaries, ids, per-token cost. Toy BPE on a small vocab to show merging. Must handle non-English, code, emoji to drive the "tokens ≠ words" point home.
+3. **Embedding scatter (25–35 min):** 2D PCA/t-SNE of a curated word set. Hover to see word, zoom to see clusters. "King − man + woman" as a button-driven pull-out.
+4. **Residual stream animator (35–45 min):** Pick a token position. Watch its vector evolve as we walk down the layers. Color-coded delta per layer ("this layer added this much"). End state is "predict the next token." Primes S2's question: how does each layer decide what to write?
+
+**Facilitator timeboxing note:** Interactives are the highest rabbit-hole risk in S1. Each one has a hard time cap. If the room wants to keep playing with the tokenizer, the answer is "the slides ship to you after, play with it tonight; we have to move on." This is non-negotiable for keeping the 45-min budget intact.
 
 **Pre-read priming goal (~1,000 words):** Plant three questions the session will answer:
 1. Why does the model charge per token, and what is a token anyway?
