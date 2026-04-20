@@ -31,6 +31,10 @@ importers:
         version: 5.4.21(@types/node@18.19.130)
 
   demos/residual-stream-animator:
+    dependencies:
+      '@life-of-an-agent/brand':
+        specifier: workspace:*
+        version: link:../../shared/brand
     devDependencies:
       vite:
         specifier: ^5.4.0

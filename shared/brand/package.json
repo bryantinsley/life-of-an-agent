@@ -9,6 +9,7 @@
     "./fonts.css": "./src/fonts.css",
     "./reset.css": "./src/reset.css",
     "./brand.css": "./src/brand.css",
+    "./demo-surface.css": "./src/demo-surface.css",
     "./BrandMark.vue": "./src/BrandMark.vue"
   },
   "dependencies": {

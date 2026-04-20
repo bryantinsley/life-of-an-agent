@@ -3,32 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Residual stream — watch a token evolve through GPT-2</title>
+    <title>Residual stream — Life of an Agent / S1</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
-  <body>
-    <div class="app">
-      <header class="hdr">
-        <div class="hdr-left">
-          <div class="title">Residual stream — watch one position evolve</div>
-          <div class="sub">
-            Real activations from GPT-2 small (124M, 12 transformer blocks). Each block reads
-            from the residual stream and <i>adds</i> something to it &mdash; never overwrites.
-            Pick a sentence, pick a position, then step through the layers.
-          </div>
+  <body class="loa-demo">
+    <div class="loa-demo-shell">
+      <header class="loa-demo-header">
+        <div class="loa-demo-header-left">
+          <div class="loa-demo-kicker">S1 · Demo 4 · Residual stream</div>
+          <h1 class="loa-demo-title">Watch one position evolve through GPT-2.</h1>
+          <p class="loa-demo-sub">
+            Real activations from GPT-2 small (124M, 12 transformer blocks). Each block
+            <i>adds</i> to the residual stream — never overwrites. Pick a sentence,
+            pick a position, step through the layers.
+          </p>
         </div>
-        <a href="../" class="back">↩ all demos</a>
+        <a href="../" class="loa-demo-back">↩ all demos</a>
       </header>
 
-      <section class="picker">
-        <div class="picker-label">sentence:</div>
-        <div class="ex-chips" id="ex-chips"></div>
+      <section class="loa-demo-chipbar">
+        <div class="loa-demo-chipbar-label">sentence</div>
+        <div class="loa-demo-chips" id="ex-chips"></div>
       </section>
 
       <main class="main">
-        <section class="left-col">
-          <div class="panel-head">
-            residual stream &middot; bars show <i>delta norm</i> per block (what each block added)
+        <section class="loa-demo-panel">
+          <div class="loa-demo-panel-head">
+            residual stream · bars show <i>delta norm</i> per block (what each block added)
           </div>
           <div class="grid-wrap">
             <div class="grid-tokens" id="grid-tokens"></div>
@@ -37,39 +38,44 @@
           <div class="grid-legend">
             <span>position →</span>
             <span class="grid-legend-spacer"></span>
-            <span>↓ blocks 1&mdash;12 (residual accumulates)</span>
+            <span>↓ blocks 1—12 (residual accumulates)</span>
           </div>
         </section>
 
-        <section class="right-col">
-          <div class="panel-head">
-            logit lens &middot; "what would GPT-2 predict <i>here</i>?"
+        <section class="loa-demo-panel">
+          <div class="loa-demo-panel-head">
+            logit lens · "what would GPT-2 predict <i>here</i>?"
           </div>
           <div class="lens-explainer">
-            At each stage, project the current residual through the unembedding to read out
-            the model's top next-token guesses. Watch the prediction sharpen as the layers compose.
+            At each stage, project the current residual through the unembedding to read
+            out the model's top next-token guesses. Watch the prediction sharpen as the
+            layers compose.
           </div>
-          <div class="lens-stage" id="lens-stage">stage <b id="stage-num">0</b> / <span id="stage-total">12</span> &mdash; <span id="stage-name">embedding</span></div>
+          <div class="lens-stage" id="lens-stage">
+            stage <b id="stage-num">0</b> / <span id="stage-total">12</span> —
+            <span id="stage-name">embedding</span>
+          </div>
           <div class="lens-list" id="lens-list"></div>
           <div class="controls">
-            <button id="btn-prev"  class="btn ghost">← back</button>
-            <button id="btn-reset" class="btn ghost">reset</button>
-            <button id="btn-play"  class="btn ghost">▶ play</button>
-            <button id="btn-next"  class="btn primary">next layer →</button>
+            <button id="btn-prev"  class="loa-demo-btn is-ghost">← back</button>
+            <button id="btn-reset" class="loa-demo-btn is-ghost">reset</button>
+            <button id="btn-play"  class="loa-demo-btn is-ghost">▶ play</button>
+            <button id="btn-next"  class="loa-demo-btn is-primary" style="flex: 1;">next layer →</button>
           </div>
         </section>
       </main>
 
-      <aside class="footer-note">
-        <b>How to read this:</b> each colored bar shows the L2 norm of what that block <i>added</i>
-        at that position. Tall bar = big contribution. Notice the bars are not uniform &mdash;
-        the work is unevenly distributed across layers and across positions.
+      <aside class="loa-demo-note">
+        <b>How to read this:</b> each colored bar shows the L2 norm of what that block
+        <i>added</i> at that position. Tall bar = big contribution. The work is unevenly
+        distributed across layers and positions.
         <br /><br />
-        On the right, the logit lens shows the model's next-token guess if you stopped at that layer.
-        Early layers guess generic high-frequency tokens. Later layers sharpen toward the real
-        next token. <i>(Caveat: GPT-2 applies a final layer norm before the LM head; we skip it
-        for the demo, so early-layer predictions look slightly noisier than they would in a "true"
-        logit lens. The shape of the story is unchanged.)</i>
+        On the right, the logit lens shows the model's next-token guess if you stopped
+        at that layer. Early layers guess generic high-frequency tokens; later layers
+        sharpen toward the real next token.
+        <i>(Caveat: GPT-2 applies a final layer norm before the LM head; we skip it for
+        the demo, so early-layer predictions look slightly noisier than they would in a
+        "true" logit lens. The shape of the story is unchanged.)</i>
       </aside>
     </div>
 

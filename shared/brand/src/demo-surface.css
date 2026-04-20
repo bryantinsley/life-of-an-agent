@@ -1,0 +1,270 @@
+/*
+ * Life of an Agent — demo surface (dark).
+ *
+ * Shared visual language for every interactive demo. The deck uses the light
+ * paper register for content slides; demos live inside a dark data-viz
+ * instrument panel so numbers, bars, and scatter plots pop. The bridge is
+ * the shared Geist typeface + the violet/cobalt accent palette.
+ *
+ * All colors and typography resolve to tokens from tokens.css. This file
+ * adds a small set of demo-specific surface aliases + primitive components
+ * (panel, header, chip, button) so any demo can `@import` this one sheet
+ * and get a consistent look with almost no per-demo CSS.
+ *
+ * Target bounds: demos are embedded at ~860×460 (Slidev iframe on a
+ * default 980×552 slide canvas) and served standalone up to ~1400px wide.
+ */
+
+:root {
+  /* ─── demo-dark surface tokens ─── */
+  --loa-demo-bg:        #0f0d1f;              /* page background — near-black with violet undertone */
+  --loa-demo-panel:     #1a1735;              /* primary panel surface */
+  --loa-demo-panel-2:   #221d46;              /* secondary / deeper panel (cards-on-panels) */
+  --loa-demo-rule:      rgba(165, 154, 236, 0.14);  /* hairline dividers (violet-300 @ 14%) */
+  --loa-demo-rule-soft: rgba(165, 154, 236, 0.08);
+  --loa-demo-fg:        #e9e6f7;              /* primary text */
+  --loa-demo-fg-muted:  rgba(233, 230, 247, 0.62);
+  --loa-demo-fg-dim:    rgba(233, 230, 247, 0.38);
+  --loa-demo-accent:    var(--loa-cobalt-500);      /* interactive accent */
+  --loa-demo-highlight: #f0d68c;              /* selection / current state — warm amber pops on violet */
+  --loa-demo-brand:     var(--loa-violet-400);      /* brand tint inside demo surface */
+}
+
+/* ─── root container: full-viewport dark surface ─── */
+.loa-demo {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--loa-demo-bg);
+  background-image:
+    radial-gradient(circle at 8% 0%, rgba(107, 93, 211, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(42, 75, 255, 0.08) 0%, transparent 45%);
+  color: var(--loa-demo-fg);
+  font-family: var(--loa-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: var(--loa-tracking-snug);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.loa-demo a { color: var(--loa-demo-accent); text-decoration: none; }
+.loa-demo a:hover { text-decoration: underline; }
+
+.loa-demo *,
+.loa-demo *::before,
+.loa-demo *::after { box-sizing: border-box; }
+
+/* Shell: centered column with generous top/bottom air.
+   Width cap lets standalone pages breathe at 1400px; in the deck iframe
+   we're bounded by the slide width long before we hit this cap. */
+.loa-demo-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 28px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ─── demo header ─── */
+.loa-demo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--loa-demo-rule);
+  padding-bottom: 14px;
+  gap: 16px;
+}
+.loa-demo-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.loa-demo-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--loa-font-mono);
+  font-size: 10.5px;
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: var(--loa-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--loa-demo-brand);
+}
+.loa-demo-kicker::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 2px;
+  background: var(--loa-demo-accent);
+  box-shadow: 0 0 10px 0 var(--loa-demo-accent);
+}
+.loa-demo-title {
+  font-family: var(--loa-font-sans);
+  font-size: 19px;
+  font-weight: var(--loa-weight-semibold);
+  letter-spacing: var(--loa-tracking-tight);
+  line-height: 1.15;
+  color: var(--loa-demo-fg);
+  margin: 0;
+}
+.loa-demo-sub {
+  font-size: 13px;
+  color: var(--loa-demo-fg-muted);
+  line-height: 1.55;
+  max-width: 72ch;
+  margin: 0;
+}
+.loa-demo-sub i, .loa-demo-sub em {
+  color: var(--loa-demo-fg);
+  font-style: italic;
+}
+.loa-demo-back {
+  color: var(--loa-demo-fg-dim);
+  font-family: var(--loa-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.loa-demo-back:hover { color: var(--loa-demo-accent); text-decoration: none; }
+
+/* ─── panels (the primary content containers) ─── */
+.loa-demo-panel {
+  background: var(--loa-demo-panel);
+  border: 1px solid var(--loa-demo-rule);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.loa-demo-panel-head {
+  font-family: var(--loa-font-sans);
+  font-size: 12px;
+  font-weight: var(--loa-weight-medium);
+  color: var(--loa-demo-fg-muted);
+  letter-spacing: var(--loa-tracking-snug);
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--loa-demo-rule);
+}
+.loa-demo-panel-head b,
+.loa-demo-panel-head strong {
+  color: var(--loa-demo-fg);
+  font-weight: var(--loa-weight-semibold);
+}
+.loa-demo-panel-head i, .loa-demo-panel-head em {
+  color: var(--loa-demo-fg);
+  font-style: italic;
+}
+
+/* ─── chips (sentence picker, filters) ─── */
+.loa-demo-chipbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--loa-demo-panel);
+  border: 1px solid var(--loa-demo-rule);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.loa-demo-chipbar-label {
+  font-family: var(--loa-font-mono);
+  font-size: 10.5px;
+  color: var(--loa-demo-fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+.loa-demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+.loa-demo-chip {
+  font-family: var(--loa-font-mono);
+  font-size: 12px;
+  background: var(--loa-demo-panel-2);
+  color: var(--loa-demo-fg-muted);
+  border: 1px solid var(--loa-demo-rule);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color var(--loa-duration-fast) var(--loa-ease),
+              border-color var(--loa-duration-fast) var(--loa-ease),
+              background var(--loa-duration-fast) var(--loa-ease);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.loa-demo-chip:hover {
+  color: var(--loa-demo-fg);
+  border-color: var(--loa-demo-accent);
+}
+.loa-demo-chip.is-active {
+  color: var(--loa-demo-fg);
+  border-color: var(--loa-demo-accent);
+  background: var(--loa-demo-bg);
+  box-shadow: 0 0 0 1px var(--loa-demo-accent);
+}
+
+/* ─── buttons ─── */
+.loa-demo-btn {
+  background: var(--loa-demo-panel-2);
+  color: var(--loa-demo-fg);
+  border: 1px solid var(--loa-demo-rule);
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-family: var(--loa-font-sans);
+  font-size: 13px;
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: var(--loa-tracking-snug);
+  cursor: pointer;
+  transition: border-color var(--loa-duration-fast) var(--loa-ease),
+              filter var(--loa-duration-fast) var(--loa-ease);
+}
+.loa-demo-btn:hover:not(:disabled) { border-color: var(--loa-demo-accent); }
+.loa-demo-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.loa-demo-btn.is-ghost { background: transparent; }
+.loa-demo-btn.is-primary {
+  background: var(--loa-demo-accent);
+  color: #fff;
+  border-color: var(--loa-demo-accent);
+  font-weight: var(--loa-weight-semibold);
+}
+.loa-demo-btn.is-primary:hover:not(:disabled) { filter: brightness(1.1); border-color: var(--loa-cobalt-400); }
+
+/* ─── footer-note callout (methodology / caveats) ─── */
+.loa-demo-note {
+  background: var(--loa-demo-panel);
+  border: 1px solid var(--loa-demo-rule);
+  border-left: 3px solid var(--loa-violet-400);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--loa-demo-fg-muted);
+  line-height: 1.6;
+}
+.loa-demo-note b { color: var(--loa-demo-fg); font-weight: var(--loa-weight-semibold); }
+.loa-demo-note i, .loa-demo-note em { color: var(--loa-demo-fg); font-style: italic; }
+
+/* ─── inline code on demo surface ─── */
+.loa-demo code {
+  font-family: var(--loa-font-mono);
+  font-size: 0.9em;
+  background: var(--loa-demo-panel-2);
+  color: var(--loa-violet-200);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--loa-demo-rule);
+}
+
+/* ─── responsive: iframe-sized (~860×460) and below ─── */
+@media (max-width: 900px) {
+  .loa-demo-shell { padding: 16px 20px 40px; gap: 12px; }
+  .loa-demo-title { font-size: 17px; }
+  .loa-demo-sub { font-size: 12px; }
+}

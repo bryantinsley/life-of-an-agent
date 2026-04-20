@@ -31,7 +31,7 @@ const N_STAGES = N_LAYERS + 1;         // 13: embedding + 12 blocks
 function buildExampleChips() {
   for (const ex of data.examples) {
     const chip = document.createElement('button');
-    chip.className = 'ex-chip';
+    chip.className = 'loa-demo-chip';
     chip.textContent = ex.label;
     chip.dataset.id = ex.id;
     chip.addEventListener('click', () => selectExample(ex));
@@ -41,8 +41,8 @@ function buildExampleChips() {
 }
 
 function refreshChipState() {
-  for (const chip of $exChips.querySelectorAll('.ex-chip')) {
-    chip.classList.toggle('active', chip.dataset.id === currentEx.id);
+  for (const chip of $exChips.querySelectorAll('.loa-demo-chip')) {
+    chip.classList.toggle('is-active', chip.dataset.id === currentEx.id);
   }
 }
 
