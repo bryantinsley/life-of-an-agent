@@ -3,7 +3,7 @@
 ## A 10-Session Curriculum for SREs
 
 **Status:** Working draft v1. Facilitator-only. Not for attendees.
-**Format:** 10 sessions × 1 hour. 45 min material + 15 min Q&A per session.
+**Format:** 10 sessions × 1 hour. 45 min content target + ~15 min for in-session discussion, questions, and breathing room. Discussion bleeds into the 45 wherever it earns its place; the 15 absorbs overruns and dedicated Q&A.
 **Audience:** Google SREs. Strong systems intuition, uses LLMs daily, range of ML background from zero to some.
 
 ---
@@ -128,12 +128,14 @@ The two phases of a single inference request. Different bottlenecks, different o
 
 **Delivery principle:** Visual-first. Slides should be sparse text + dense interactive demos. Four load-bearing click-throughs (see "Interactive HTML — required" below) carry the session; bullets are scaffolding, not the substance. If an interactive is cut for time, the whole session weakens — they are the pedagogy, not embellishment.
 
-**Time breakdown (45 min):**
+**Time breakdown (45 min content target, 60 min slot — see header for budget convention):**
 - 0–10: **Agent loop demo (interactive #1).** Click through one real turn — model thinks, emits a tool call, harness dispatches, result comes back, model continues. Promise: "by session 10 you'll understand every layer of what just happened."
-- 10–15: Architecture and inference map. The single canonical diagram they'll see all course long. Training vs. inference, one sentence each. No depth — just the map. Worth dwelling on the diagram itself; this is their navigation aid for ten weeks.
-- 15–25: Tokenization. **Live tokenizer (interactive #2)** — paste their own name, emoji, code, Mandarin, the BPE merging visualizer on a toy vocab. Why tokens aren't words has to be felt, not told.
-- 25–35: Embeddings. **2D embedding scatter (interactive #3)** — projected word cluster, hover/zoom, with the "king − man + woman ≈ queen" demo as pull-out. "Similar meanings live near each other" should be visible, not asserted.
-- 35–45: The residual stream. **Residual-stream animator (interactive #4)** — one token position, watch its vector evolve layer by layer toward a prediction. This is the prime for S2: "next week we'll explain how the layer decided what to add."
+- 10–20: Tokenization. **Live tokenizer (interactive #2)** — paste their own name, emoji, code, Mandarin, the BPE merging visualizer on a toy vocab. Why tokens aren't words has to be felt, not told.
+- 20–30: Embeddings. **2D embedding scatter (interactive #3)** — projected word cluster, hover/zoom, with the "king − man + woman ≈ queen" demo as pull-out. "Similar meanings live near each other" should be visible, not asserted.
+- 30–40: The residual stream. **Residual-stream animator (interactive #4)** — one token position, watch its vector evolve layer by layer toward a prediction. This is the prime for S2: "next week we'll explain how the layer decided what to add."
+- 40–45: **Territory closer.** Pull up the canonical architecture/inference map (the diagram that will recur all course long). Now that they have the vocabulary — token, embedding, residual stream, agent loop — they can *read* the map. Walk it as "here's where you are, here's where we're going. Every block on this map gets a session. See you next week." The unrecognized regions of the map are the anticipation engine — the "I want more" trigger.
+
+**Decision log — S1 scope (2026-04-20):** Original draft included a 5-min architecture/inference map slot at minutes 10–15 as upfront scaffolding. Cut and relocated to a 5-min closer at minutes 40–45. Reason: upfront, the map is words they don't yet have referents for — boring, doesn't wow. As a closer, the same map becomes anticipation-builder because they recognize the parts we just unpacked and see the scope of what remains. This serves the "rock their world / I want more" walk-away goal directly. Each of the four interactives gains a clean 10-min slot. The 60-min total slot leaves ~15 min for discussion bleed and Q&A — interactives are the most likely overrun source, so the buffer is real, not nominal.
 
 **Learning objectives:**
 - Describe what a token is and why tokenization affects behavior (cost, edge cases, non-English).
