@@ -8,25 +8,24 @@
 
 import data from './data.json';
 
-// Categorical palette tuned for the white surface. Violet-leaning where
-// possible so the plot reads as part of the Life-of-an-Agent system,
-// with enough hue separation that 15 categories stay distinguishable.
+// Categorical palette tuned for the dark demo surface — 15 distinguishable hues
+// at enough saturation/lightness to pop on #0f0d1f.
 const CAT_COLORS = {
-  royalty:      '#7c3aed',
-  people:       '#ea580c',
-  country:      '#2563eb',
-  city:         '#0ea5e9',
-  color:        '#16a34a',
-  animal:       '#a16207',
-  fruit:        '#be185d',
-  food:         '#c2410c',
-  body:         '#dc2626',
-  vehicle:      '#0891b2',
-  weather:      '#475569',
-  emotion:      '#d97706',
-  'verb-motion': '#059669',
-  'verb-think':  '#6d28d9',
-  tech:         '#0d9488',
+  royalty:      '#c7bff4',   // pale violet
+  people:       '#ffb380',   // warm peach
+  country:      '#7a90ff',   // cobalt
+  city:         '#5dd6ff',   // sky
+  color:        '#8cd39a',   // mint
+  animal:       '#e3b96b',   // amber
+  fruit:        '#ff8ec5',   // pink
+  food:         '#f0a86b',   // tangerine
+  body:         '#ff6f91',   // coral
+  vehicle:      '#4fd0d4',   // teal
+  weather:      '#b8b1d4',   // cool grey
+  emotion:      '#f0d68c',   // warm gold
+  'verb-motion': '#64e6a0',  // spring
+  'verb-think':  '#a59aec',  // violet
+  tech:         '#6dd9d0',   // aqua
 };
 
 const ANALOGIES = [
@@ -78,7 +77,7 @@ function draw() {
   ctx.clearRect(0, 0, w, h);
 
   // Axes
-  ctx.strokeStyle = 'rgba(122, 119, 143, 0.18)';
+  ctx.strokeStyle = 'rgba(165, 154, 236, 0.18)';
   ctx.lineWidth = 1;
   const [cx, cy] = plotCoords(0, 0);
   ctx.beginPath();
@@ -87,8 +86,8 @@ function draw() {
   ctx.stroke();
 
   // Caption
-  ctx.fillStyle = 'rgba(122, 119, 143, 0.85)';
-  ctx.font = `11px 'Geist', sans-serif`;
+  ctx.fillStyle = 'rgba(233, 230, 247, 0.55)';
+  ctx.font = `11px 'Geist Variable', 'Geist', sans-serif`;
   const evx = (data.pca_explained_variance[0] * 100).toFixed(1);
   const evy = (data.pca_explained_variance[1] * 100).toFixed(1);
   ctx.fillText(`PC1 (${evx}%)`, w - PADDING - 70, cy - 4);
@@ -115,12 +114,14 @@ function draw() {
     ctx.fill();
     if (isAnalogyHighlight) {
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#1a1735';
+      ctx.strokeStyle = '#f0d68c';
       ctx.stroke();
     }
     if (showLabels) {
-      ctx.fillStyle = isAnalogyHighlight ? '#1a1735' : 'rgba(61, 58, 92, 0.85)';
-      ctx.font = isAnalogyHighlight ? `600 12px 'Geist', sans-serif` : `11px 'Geist', sans-serif`;
+      ctx.fillStyle = isAnalogyHighlight ? '#f0d68c' : 'rgba(233, 230, 247, 0.72)';
+      ctx.font = isAnalogyHighlight
+        ? `600 12px 'Geist Variable', 'Geist', sans-serif`
+        : `11px 'Geist Variable', 'Geist', sans-serif`;
       ctx.fillText(w.word, px + 6, py + 3);
     }
   }
@@ -135,8 +136,8 @@ function drawArrow({a, b, c, result}) {
 
   // Two parallel arrows: b → a, and c → result. They should be roughly parallel
   // if the analogy direction lives cleanly in the embedding space.
-  drawArrowSeg(wb, wa, '#4a3eb8');     // brand violet-deep
-  drawArrowSeg(wcw, wr, '#2a4bff');    // brand cobalt
+  drawArrowSeg(wb, wa, '#a59aec');     // violet-300 (pops on dark)
+  drawArrowSeg(wcw, wr, '#7a90ff');    // cobalt-400 (pops on dark)
 }
 
 function drawArrowSeg(p1, p2, color) {
@@ -258,7 +259,7 @@ function runAnalogy(an) {
     <div class="analogy-result">
       <code>${an.a} − ${an.b} + ${an.c}</code>
       <span class="arrow">→</span>
-      <b style="color: ${right ? '#1b7a4d' : '#b34b0a'}">${top.word}</b>
+      <b style="color: ${right ? '#8cd39a' : '#f0a86b'}">${top.word}</b>
       <span class="analogy-meta">cos ${top.score.toFixed(3)}</span>
       ${right
         ? '<span class="analogy-tag tag-good">expected</span>'

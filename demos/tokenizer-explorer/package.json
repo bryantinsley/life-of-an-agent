@@ -9,6 +9,7 @@
     "preview": "vite preview --port 5175"
   },
   "dependencies": {
+    "@life-of-an-agent/brand": "workspace:*",
     "gpt-tokenizer": "^2.5.0"
   },
   "devDependencies": {

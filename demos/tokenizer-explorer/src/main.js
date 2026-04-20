@@ -69,7 +69,7 @@ function render() {
 
   $tokens.innerHTML = '';
   if (tokens.length === 0) {
-    $tokens.innerHTML = '<span style="color: var(--text-dim);">paste or type something above…</span>';
+    $tokens.innerHTML = '<span style="color: var(--loa-demo-fg-dim);">paste or type something above…</span>';
     return;
   }
   tokens.forEach((t, i) => {
@@ -101,7 +101,7 @@ function render() {
 
 SAMPLES.forEach((s) => {
   const btn = document.createElement('button');
-  btn.className = 'sample-btn';
+  btn.className = 'loa-demo-chip';
   btn.textContent = s.label;
   btn.addEventListener('click', () => {
     $input.value = s.text;

@@ -6,60 +6,45 @@
     <title>Embedding scatter — Life of an Agent / S1</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
-  <body>
-    <div class="loa-scope app">
-      <header class="hdr">
-        <div class="hdr-brand">
-          <div class="loa-brandmark on-paper" aria-label="Life of an Agent"></div>
-          <div class="hdr-brand-text">
-            <div class="hdr-wordmark">Life of an Agent</div>
-            <div class="hdr-location">S1 · Demo 3 · Embedding scatter</div>
-          </div>
+  <body class="loa-demo">
+    <div class="loa-demo-shell">
+      <header class="loa-demo-header">
+        <div class="loa-demo-header-left">
+          <div class="loa-demo-kicker">S1 · Demo 3 · Embedding scatter</div>
+          <h1 class="loa-demo-title">
+            137 single-token words, projected to 2D — related meanings cluster.
+          </h1>
+          <p class="loa-demo-sub">
+            GPT-2 small's input embedding table (<code>wte</code>), PCA'd to 2D. The clustering
+            wasn't put there by hand — it falls out of the next-token training objective. Hover a
+            word to see neighbors; try an analogy below to see the direction in vector space.
+          </p>
         </div>
-        <div class="hdr-meta">
-          <span class="hdr-meta-kicker">Vectors carry meaning</span>
-          <span class="hdr-meta-dot"></span>
-          <span class="hdr-meta-source">GPT-2 small · 124M · <code>wte</code> → PCA 2D</span>
-        </div>
+        <a href="../" class="loa-demo-back">↩ all demos</a>
       </header>
-
-      <section class="lede">
-        <h1 class="lede-title">
-          137 single-token words, projected to 2D.
-          <span class="lede-title-accent">Related meanings cluster together.</span>
-        </h1>
-        <p class="lede-body">
-          The clustering wasn't put there by hand — it falls out of the next-token training
-          objective. Hover a word to see its position. Try a vector-arithmetic analogy below:
-          subtract one direction from another, add it to a third, find the closest word.
-        </p>
-      </section>
 
       <section class="controls">
         <div class="controls-left">
-          <span class="controls-label">Categories</span>
+          <span class="controls-label">categories</span>
           <div class="cat-chips" id="cat-chips"></div>
         </div>
-        <div class="controls-right">
-          <label class="toggle">
-            <input type="checkbox" id="show-labels" checked />
-            <span class="toggle-track"></span>
-            <span class="toggle-text">Labels</span>
-          </label>
+        <label class="toggle">
+          <input type="checkbox" id="show-labels" checked />
+          <span class="toggle-track"></span>
+          <span class="toggle-text">labels</span>
+        </label>
+      </section>
+
+      <section class="loa-demo-panel plot-panel">
+        <div class="plot-wrap">
+          <canvas id="plot"></canvas>
+          <div class="hover-card" id="hover-card" hidden></div>
         </div>
       </section>
 
-      <section class="plot-wrap">
-        <canvas id="plot"></canvas>
-        <div class="hover-card" id="hover-card" hidden></div>
-      </section>
-
-      <section class="analogy">
-        <div class="analogy-head">
-          <span class="analogy-kicker">Vector arithmetic</span>
-          <span class="analogy-subtitle">
-            Subtract and add the <em>high-dim</em> vectors, find the closest word in the table.
-          </span>
+      <section class="loa-demo-panel">
+        <div class="loa-demo-panel-head">
+          vector arithmetic · subtract and add the <i>high-dim</i> vectors, find the closest word
         </div>
         <div class="analogy-row" id="analogy-row"></div>
         <div class="analogy-explainer" id="analogy-explainer">
@@ -67,15 +52,12 @@
         </div>
       </section>
 
-      <aside class="note">
-        <div class="note-label">Honest caveat</div>
-        <div class="note-body">
-          The famous <code>king − man + woman ≈ queen</code> result was much cleaner in older
-          word-embedding models (word2vec, GloVe) trained directly for that property. In modern
-          LLM input-embedding tables it's <em>fuzzier</em> — it works for some pairs and not others.
-          The point isn't that the geometry is perfectly clean; it's that the <em>direction</em>
-          "male → female" is detectable as a vector at all.
-        </div>
+      <aside class="loa-demo-note">
+        <b>Honest caveat:</b> the famous <code>king − man + woman ≈ queen</code> result was much
+        cleaner in older word-embedding models (word2vec, GloVe) trained directly for that
+        property. In modern LLM input-embedding tables it's <i>fuzzier</i> — it works for some
+        pairs and not others. The point isn't that the geometry is perfectly clean; it's that the
+        <i>direction</i> "male → female" is detectable as a vector at all.
       </aside>
     </div>
 

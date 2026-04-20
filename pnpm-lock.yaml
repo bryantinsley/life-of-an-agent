@@ -9,6 +9,10 @@ importers:
   .: {}
 
   demos/agent-loop:
+    dependencies:
+      '@life-of-an-agent/brand':
+        specifier: workspace:*
+        version: link:../../shared/brand
     devDependencies:
       vite:
         specifier: ^5.4.0
@@ -42,6 +46,9 @@ importers:
 
   demos/tokenizer-explorer:
     dependencies:
+      '@life-of-an-agent/brand':
+        specifier: workspace:*
+        version: link:../../shared/brand
       gpt-tokenizer:
         specifier: ^2.5.0
         version: 2.9.0

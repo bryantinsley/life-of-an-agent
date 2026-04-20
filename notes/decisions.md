@@ -54,6 +54,14 @@ Running record of decisions made during production. New entries at the bottom. E
 - `residual-stream` — animated per-layer state evolution, also precomputed.
 - **Why:** GitHub Pages is static-only. No inference server. The `precompute_*.py` scripts run once locally, produce data files, demos replay them. This keeps the whole `_site/` under ~2.2 MB (0.2% of GH Pages' 1 GB site quota).
 
+### D8. All 4 S1 demos share a single dark "instrument panel" surface
+
+- `shared/brand/src/demo-surface.css` is the one-stop import every demo pulls in. It provides: demo-dark tokens (`--loa-demo-bg`, `--loa-demo-panel`, etc.), the `.loa-demo` root + `.loa-demo-shell` layout, and primitive components (`.loa-demo-header`, `.loa-demo-kicker`, `.loa-demo-title`, `.loa-demo-sub`, `.loa-demo-back`, `.loa-demo-panel`, `.loa-demo-chipbar`, `.loa-demo-chip`, `.loa-demo-btn`, `.loa-demo-note`).
+- Per-demo CSS now only contains *demo-specific* styles (token grid, logit-lens rows, scatter controls, step-card type colors, etc.) — the chrome comes from the shared package.
+- **Why:** deck lives in the light "paper" register; demos live in a dark data-viz register — the bridge between them is shared Geist typography + the violet/cobalt accent system. One source of truth means future demos across S2–S10 inherit the look with ~5 lines of CSS.
+- **Rollout status (2026-04-20):** residual-stream-animator ✓, agent-loop ✓, tokenizer-explorer ✓, embedding-scatter ✓ (flipped from light to dark to match peers).
+- **Per-demo color preservation:** agent-loop keeps its step-type colors (think/tool/dispatch/result/final) as domain semantics, now remapped onto `--loa-*` tokens. Embedding-scatter got a new 15-hue categorical palette tuned for contrast on `#0f0d1f`.
+
 ### D7. [PENDING] Tokenizer family swap: GPT-2 / cl100k_base → Gemma
 
 - Bryan asked: does Google have an open-source tokenizer we can use instead? Answer: **Gemma** (SentencePiece unigram-LM, ~256K vocab).

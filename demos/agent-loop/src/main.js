@@ -47,7 +47,7 @@ function render() {
         <span class="step-num">wrap-up</span>
         <span class="step-type">what just happened</span>
       </div>
-      <div class="step-content" style="white-space: pre-wrap; font-family: var(--sans); font-size: 13px;"></div>
+      <div class="step-content" style="white-space: pre-wrap; font-family: var(--loa-font-sans); font-size: 13px;"></div>
     `;
     card.querySelector('.step-content').textContent = wrapUp;
     $loop.appendChild(card);

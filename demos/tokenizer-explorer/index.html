@@ -3,22 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tokenizer explorer — see what the model actually sees</title>
+    <title>Tokenizer explorer — Life of an Agent / S1</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
-  <body>
-    <div class="app">
-      <header class="hdr">
-        <div>
-          <div class="title">Tokenizer explorer</div>
-          <div class="sub">Real BPE running entirely in your browser. No server call. Paste anything; watch the model's view.</div>
+  <body class="loa-demo">
+    <div class="loa-demo-shell">
+      <header class="loa-demo-header">
+        <div class="loa-demo-header-left">
+          <div class="loa-demo-kicker">S1 · Demo 2 · Tokenizer</div>
+          <h1 class="loa-demo-title">See what the model actually sees.</h1>
+          <p class="loa-demo-sub">
+            Real BPE running entirely in your browser — no server call. Paste anything; watch
+            the model's view.
+          </p>
         </div>
-        <a href="../" class="back">↩ all demos</a>
+        <a href="../" class="loa-demo-back">↩ all demos</a>
       </header>
 
-      <section class="samples">
-        <div class="samples-label">try a sample</div>
-        <div class="samples-row" id="samples-row"></div>
+      <section class="loa-demo-chipbar">
+        <div class="loa-demo-chipbar-label">try a sample</div>
+        <div class="loa-demo-chips" id="samples-row"></div>
       </section>
 
       <section class="input-section">
@@ -35,7 +39,7 @@
           <div class="stat-num" id="stat-bytes">0</div>
           <div class="stat-label">UTF-8 bytes</div>
         </div>
-        <div class="stat highlight">
+        <div class="stat is-highlight">
           <div class="stat-num" id="stat-tokens">0</div>
           <div class="stat-label">tokens</div>
         </div>
@@ -49,14 +53,22 @@
         </div>
       </section>
 
-      <section class="tokens-section">
-        <div class="tokens-label">how the tokenizer cut it up — hover any chunk for token id</div>
+      <section class="loa-demo-panel">
+        <div class="loa-demo-panel-head">
+          how the tokenizer cut it up — hover any chunk for token id
+        </div>
         <div id="tokens" class="tokens"></div>
       </section>
 
-      <aside class="footer-note">
-        <div><b>Tokenizer:</b> <code>cl100k_base</code> — the BPE used by GPT-4 family. Different models use different tokenizers (Gemini uses SentencePiece with ~256K pieces, shared with Gemma; Llama uses its own SentencePiece BPE), but the *family of behaviors* — sub-word, leading-space-sensitive, multilingually uneven — is shared across all of them.</div>
-        <div style="margin-top: 6px;"><b>Why this matters:</b> the token count is the bill, the latency, the context budget. Bytes do not predict tokens; they have to be measured.</div>
+      <aside class="loa-demo-note">
+        <b>Tokenizer:</b> <code>cl100k_base</code> — the BPE used by GPT-4 family. Different
+        models use different tokenizers (Gemini uses SentencePiece with ~256K pieces, shared
+        with Gemma; Llama uses its own SentencePiece BPE), but the <i>family of behaviors</i>
+        — sub-word, leading-space-sensitive, multilingually uneven — is shared across all of
+        them.
+        <br /><br />
+        <b>Why this matters:</b> the token count is the bill, the latency, the context
+        budget. Bytes do not predict tokens; they have to be measured.
       </aside>
     </div>
 

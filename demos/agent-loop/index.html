@@ -3,19 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agent loop — one full turn, end to end</title>
+    <title>Agent loop — Life of an Agent / S1</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
-  <body>
-    <div class="app">
-      <header class="hdr">
-        <div class="hdr-left">
-          <div class="title">One agent turn, end to end</div>
-          <div class="sub">A real-shape SRE debugging task. Step through and watch the loop: model emits → harness dispatches → result returns → model continues.</div>
+  <body class="loa-demo">
+    <div class="loa-demo-shell">
+      <header class="loa-demo-header">
+        <div class="loa-demo-header-left">
+          <div class="loa-demo-kicker">S1 · Demo 1 · Agent loop</div>
+          <h1 class="loa-demo-title">One agent turn, end to end.</h1>
+          <p class="loa-demo-sub">
+            A real-shape SRE debugging task. Step through and watch the loop:
+            model emits → harness dispatches → result returns → model continues.
+          </p>
         </div>
-        <div class="hdr-right">
-          <a href="../" class="back">↩ all demos</a>
-        </div>
+        <a href="../" class="loa-demo-back">↩ all demos</a>
       </header>
 
       <section class="scenario">
@@ -23,26 +25,28 @@
         <div class="scenario-body" id="scenario-body"></div>
       </section>
 
-      <main class="loop" id="loop"></main>
+      <div class="loa-demo-main">
+        <main class="loop" id="loop"></main>
+
+        <aside class="legend">
+          <div class="legend-title">legend — every box is a layer we'll bottom out</div>
+          <div class="legend-grid">
+            <div class="lg lg-think"><span class="dot"></span><div><b>model thinks</b> — tokens emitted into a hidden reasoning channel</div></div>
+            <div class="lg lg-tool"><span class="dot"></span><div><b>tool call</b> — structured tokens the harness recognizes</div></div>
+            <div class="lg lg-dispatch"><span class="dot"></span><div><b>harness dispatch</b> — code outside the model executes the call</div></div>
+            <div class="lg lg-result"><span class="dot"></span><div><b>tool result</b> — pasted back into context as if it were a message</div></div>
+            <div class="lg lg-final"><span class="dot"></span><div><b>final answer</b> — model emits text instead of a tool call; loop ends</div></div>
+          </div>
+        </aside>
+      </div>
 
       <footer class="controls">
-        <button id="btn-prev" class="btn">← back</button>
-        <button id="btn-reset" class="btn ghost">reset</button>
+        <button id="btn-prev" class="loa-demo-btn is-ghost">← back</button>
+        <button id="btn-reset" class="loa-demo-btn is-ghost">reset</button>
         <div class="step-indicator"><span id="step-cur">0</span> / <span id="step-total">0</span></div>
-        <button id="btn-auto" class="btn ghost">auto-play</button>
-        <button id="btn-next" class="btn primary">next →</button>
+        <button id="btn-auto" class="loa-demo-btn is-ghost">auto-play</button>
+        <button id="btn-next" class="loa-demo-btn is-primary">next →</button>
       </footer>
-
-      <aside class="legend">
-        <div class="legend-title">legend — every box is a layer we'll bottom out</div>
-        <div class="legend-grid">
-          <div class="lg lg-think"><span class="dot"></span><b>model thinks</b> — tokens emitted into a hidden reasoning channel</div>
-          <div class="lg lg-tool"><span class="dot"></span><b>tool call</b> — structured tokens the harness recognizes</div>
-          <div class="lg lg-dispatch"><span class="dot"></span><b>harness dispatch</b> — code outside the model executes the call</div>
-          <div class="lg lg-result"><span class="dot"></span><b>tool result</b> — pasted back into context as if it were a message</div>
-          <div class="lg lg-final"><span class="dot"></span><b>final answer</b> — the model emits text instead of a tool call; loop ends</div>
-        </div>
-      </aside>
     </div>
 
     <script type="module" src="/src/main.js"></script>
