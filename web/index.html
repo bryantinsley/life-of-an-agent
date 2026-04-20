@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life of an Agent — How LLMs and Agents Actually Work</title>
+  <meta name="description" content="A 10-session SRE curriculum on how LLMs and agents actually work. Slides, narratives, and interactive demos." />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <header class="brand-bar">
+    <a class="brand-mark" href="./">
+      <span class="brand-mark-glyph"></span>
+      <span class="brand-mark-text">Life of an Agent</span>
+    </a>
+    <span class="brand-bar-meta">10-session SRE curriculum</span>
+  </header>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero-eyebrow">how LLMs and agents actually work</div>
+      <h1 class="hero-title">From a token in,<br/>to a tool call out.</h1>
+      <p class="hero-tagline">
+        Ten sessions tracing what happens between the moment text arrives at a model
+        and the moment an agent runs a real action — and what changes when you have
+        to operate the whole loop at scale.
+      </p>
+      <div class="hero-meta">
+        <span><b>Format</b> 45 min content + 15 min Q&amp;A, weekly</span>
+        <span class="hero-sep">·</span>
+        <span><b>Audience</b> Google SREs, no ML background assumed</span>
+        <span class="hero-sep">·</span>
+        <span><b>Pedagogy</b> interactive demos in every session</span>
+      </div>
+    </header>
+
+    <section class="block">
+      <h2 class="block-title">Sessions</h2>
+      <p class="block-sub">
+        Each session ships five artifacts: slides, a facilitator guide, a narrative companion document
+        (so the deck stands alone), a fact-check ledger with sources, and a study prompt you can paste into a chatbot
+        between sessions to test understanding.
+      </p>
+      <div class="grid">
+        <a class="card session ready" href="./sessions/s1/">
+          <div class="card-num">S1</div>
+          <div class="card-title">Foundations I — From Text to Vectors</div>
+          <div class="card-sub">
+            Tokens, embeddings, and the residual stream. The agent loop preview
+            that frames the rest of the course.
+          </div>
+          <div class="card-meta">
+            <span class="status status-ready">ready</span>
+            <span class="card-link">slides →</span>
+          </div>
+        </a>
+
+        <div class="card session pending">
+          <div class="card-num">S2</div>
+          <div class="card-title">Foundations II — Attention &amp; Context</div>
+          <div class="card-sub">Attention mechanism, context window, "lost in the middle".</div>
+          <div class="card-meta"><span class="status status-pending">in progress</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S3</div>
+          <div class="card-title">Architectures &amp; Variants</div>
+          <div class="card-sub">Decoder-only families, model size vs capability, the Gemini tier ladder.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S4</div>
+          <div class="card-title">Training, Compute, Hardware</div>
+          <div class="card-sub">Pretraining at scale, TPUs vs GPUs, what "exaflop" actually buys.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S5</div>
+          <div class="card-title">Sparse Models &amp; MoE</div>
+          <div class="card-sub">Mixture-of-experts, what activation ratios mean for serving.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S6</div>
+          <div class="card-title">Inference Economics</div>
+          <div class="card-sub">Prefill vs decode, KV cache, prompt-caching, why long context is a billing question.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S7</div>
+          <div class="card-title">Serving Systems</div>
+          <div class="card-sub">vLLM, PagedAttention, batching, what an SRE actually owns.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S8</div>
+          <div class="card-title">Agents &amp; Tools</div>
+          <div class="card-sub">Function calling, the agent loop in detail, ADK and Vertex Agent Engine.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S9</div>
+          <div class="card-title">Evaluation &amp; Reliability</div>
+          <div class="card-sub">How you tell if an agent is good, trajectory metrics, regression catches.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+
+        <div class="card session pending">
+          <div class="card-num">S10</div>
+          <div class="card-title">Operations &amp; the Road Ahead</div>
+          <div class="card-sub">SLOs for an agent, observability, what's coming next.</div>
+          <div class="card-meta"><span class="status status-pending">planned</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2 class="block-title">Demos</h2>
+      <p class="block-sub">
+        Every demo is a standalone web app — no install, no setup. Open one in a tab,
+        click around. Each one is also embedded in the slide where it appears.
+      </p>
+      <div class="grid">
+        <a class="card demo" href="./demos/agent-loop/">
+          <div class="card-tag">S1</div>
+          <div class="card-title">Agent loop walkthrough</div>
+          <div class="card-sub">
+            Step through what happens when an SRE asks a model to debug an OOM-killed pod —
+            think, tool call, dispatch, result, repeat.
+          </div>
+          <div class="card-meta"><span class="card-link">open demo →</span></div>
+        </a>
+
+        <a class="card demo" href="./demos/tokenizer-explorer/">
+          <div class="card-tag">S1</div>
+          <div class="card-title">Tokenizer explorer</div>
+          <div class="card-sub">
+            Real BPE in your browser. Paste anything; see how the model actually
+            cuts it up — and why bytes don't predict tokens.
+          </div>
+          <div class="card-meta"><span class="card-link">open demo →</span></div>
+        </a>
+
+        <a class="card demo" href="./demos/embedding-scatter/">
+          <div class="card-tag">S1</div>
+          <div class="card-title">Embedding scatter</div>
+          <div class="card-sub">
+            Real GPT-2 input embeddings projected to 2D. Watch related words cluster.
+            Try the analogy buttons and see vector arithmetic actually work.
+          </div>
+          <div class="card-meta"><span class="card-link">open demo →</span></div>
+        </a>
+
+        <a class="card demo" href="./demos/residual-stream-animator/">
+          <div class="card-tag">S1</div>
+          <div class="card-title">Residual stream animator</div>
+          <div class="card-sub">
+            Real GPT-2 activations, layer by layer. Watch a token evolve and see
+            the model's prediction sharpen as the residual accumulates.
+          </div>
+          <div class="card-meta"><span class="card-link">open demo →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div>
+        <b>Source:</b>
+        <a href="https://github.com/bryantinsley/life-of-an-agent" target="_blank">github.com/bryantinsley/life-of-an-agent</a>
+      </div>
+      <div class="foot-note">
+        Slides built with <a href="https://sli.dev" target="_blank">Slidev</a>.
+        Demos are vanilla Vite. All artifacts are open source.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

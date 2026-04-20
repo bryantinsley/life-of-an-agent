@@ -1,0 +1,5 @@
+packages:
+  - 'sessions/*'
+  - 'demos/*'
+  - 'web'
+  - 'shared/brand'

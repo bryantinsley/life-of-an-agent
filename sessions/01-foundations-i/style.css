@@ -1,0 +1,305 @@
+/*
+ * Life of an Agent — S1 deck styles.
+ * Auto-loaded by Slidev (adjacent to slides.md). Pulls in the shared brand
+ * system, then refits Slidev's stock chrome to the violet/cobalt + Geist look.
+ * Single source of brand tokens: @life-of-an-agent/brand.
+ */
+
+@import '@life-of-an-agent/brand/fonts.css';
+@import '@life-of-an-agent/brand/tokens.css';
+@import '@life-of-an-agent/brand/brand.css';
+
+/* ─── app-wide surface: violet environment outside the slide canvas ─── */
+html, body, #app {
+  background: var(--loa-violet-600);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 88% 82%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    var(--loa-gradient-brand);
+}
+
+/* ─── slide canvas: warm paper surface, shadowed off the violet ─── */
+.slidev-layout {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-md);
+  line-height: var(--loa-leading-normal);
+  color: var(--loa-ink);
+  background: var(--loa-paper);
+  padding: var(--loa-slide-pad-y) var(--loa-slide-pad-x);
+  letter-spacing: var(--loa-tracking-snug);
+}
+
+/* ─── typography reset — stop the default theme from leaking ─── */
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4,
+.slidev-layout h5,
+.slidev-layout h6 {
+  font-family: var(--loa-font-display);
+  font-weight: var(--loa-weight-semibold);
+  letter-spacing: var(--loa-tracking-tight);
+  color: var(--loa-ink);
+  margin: 0;
+  line-height: var(--loa-leading-snug);
+}
+
+.slidev-layout h1 {
+  font-size: var(--loa-text-3xl);
+  line-height: var(--loa-leading-tight);
+  font-weight: var(--loa-weight-bold);
+}
+.slidev-layout h2 { font-size: var(--loa-text-2xl); }
+.slidev-layout h3 { font-size: var(--loa-text-xl); }
+.slidev-layout h4 { font-size: var(--loa-text-lg); }
+
+.slidev-layout p,
+.slidev-layout li {
+  font-size: var(--loa-text-md);
+  line-height: var(--loa-leading-relaxed);
+  color: var(--loa-ink);
+  letter-spacing: var(--loa-tracking-snug);
+}
+
+.slidev-layout em        { font-style: italic; color: var(--loa-violet-800); }
+.slidev-layout strong    { font-weight: var(--loa-weight-semibold); color: var(--loa-ink); }
+
+.slidev-layout a {
+  color: var(--loa-accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--loa-cobalt-400);
+  transition: border-color var(--loa-duration-fast) var(--loa-ease);
+}
+.slidev-layout a:hover { border-bottom-color: var(--loa-cobalt-600); }
+
+/* ─── inline code + code blocks ─── */
+.slidev-layout code {
+  font-family: var(--loa-font-mono);
+  font-size: 0.9em;
+  background: var(--loa-violet-050);
+  color: var(--loa-violet-800);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--loa-violet-100);
+}
+.slidev-layout pre,
+.slidev-layout .shiki {
+  font-family: var(--loa-font-mono);
+  font-size: var(--loa-text-sm);
+  line-height: 1.55;
+  background: #f6f3fc !important;
+  border: 1px solid var(--loa-violet-100);
+  border-radius: var(--loa-radius-md);
+  padding: var(--loa-space-4);
+}
+.slidev-layout pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+
+/* ─── lists, blockquote, hr ─── */
+.slidev-layout ul,
+.slidev-layout ol { padding-left: 1.35em; margin: var(--loa-space-3) 0; }
+.slidev-layout li + li { margin-top: var(--loa-space-2); }
+.slidev-layout ul li::marker { color: var(--loa-violet-500); }
+
+.slidev-layout blockquote {
+  margin: var(--loa-space-4) 0;
+  padding: var(--loa-space-3) var(--loa-space-5);
+  border-left: 3px solid var(--loa-violet-500);
+  background: var(--loa-violet-050);
+  color: var(--loa-ink);
+  border-radius: 0 var(--loa-radius-md) var(--loa-radius-md) 0;
+}
+.slidev-layout hr {
+  border: 0;
+  border-top: 1px solid var(--loa-rule);
+  margin: var(--loa-space-5) 0;
+}
+
+.slidev-page-number {
+  font-family: var(--loa-font-mono);
+  font-size: 10px;
+  color: var(--loa-ink-dim);
+  letter-spacing: 0.08em;
+}
+
+/* ─── util classes usable inline in markdown ─── */
+.loa-kicker {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-xs);
+  font-weight: var(--loa-weight-semibold);
+  letter-spacing: var(--loa-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--loa-violet-600);
+}
+.loa-lede {
+  font-size: var(--loa-text-lg);
+  line-height: var(--loa-leading-snug);
+  color: var(--loa-ink-muted);
+  letter-spacing: var(--loa-tracking-snug);
+  max-width: 52ch;
+}
+.loa-caption {
+  font-family: var(--loa-font-mono);
+  font-size: var(--loa-text-xs);
+  letter-spacing: var(--loa-tracking-wide);
+  color: var(--loa-ink-dim);
+  text-transform: uppercase;
+}
+.loa-hero-accent {
+  background: var(--loa-gradient-hero);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.loa-chip-row { display: flex; flex-wrap: wrap; gap: var(--loa-space-2); }
+
+.loa-stat { display: flex; flex-direction: column; gap: 2px; }
+.loa-stat-num {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-3xl);
+  font-weight: var(--loa-weight-bold);
+  letter-spacing: var(--loa-tracking-tight);
+  line-height: 1;
+  color: var(--loa-violet-700);
+}
+.loa-stat-label {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-xs);
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: var(--loa-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--loa-ink-muted);
+}
+
+/* ─── persistent brand mark — bottom-left of every content slide ─── */
+.slidev-layout::after {
+  content: 'Life of an Agent  ·  S1';
+  position: absolute;
+  left: var(--loa-space-5);
+  bottom: var(--loa-space-3);
+  font-family: var(--loa-font-mono);
+  font-size: 10px;
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: var(--loa-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--loa-ink-dim);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.slidev-layout.cover::after,
+.slidev-layout.intro::after,
+.slidev-layout.section::after { content: none; }
+
+/* ─── cover layout — title slide: violet field, big display, cobalt halo ─── */
+.slidev-layout.cover,
+.slidev-layout.intro {
+  background: var(--loa-gradient-hero);
+  color: #fff;
+  padding: var(--loa-space-8) var(--loa-space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.slidev-layout.cover::before,
+.slidev-layout.intro::before {
+  content: '';
+  position: absolute;
+  top: -20%; right: -15%;
+  width: 60%; height: 80%;
+  background: radial-gradient(ellipse at center,
+              rgba(94, 116, 255, 0.45) 0%,
+              rgba(94, 116, 255, 0) 65%);
+  pointer-events: none;
+}
+.slidev-layout.cover h1,
+.slidev-layout.intro h1 {
+  font-size: var(--loa-text-5xl);
+  font-weight: var(--loa-weight-bold);
+  letter-spacing: var(--loa-tracking-tight);
+  line-height: 0.98;
+  color: #fff;
+  margin: 0 0 var(--loa-space-3) 0;
+  position: relative;
+  z-index: 1;
+}
+.slidev-layout.cover h2,
+.slidev-layout.intro h2 {
+  font-size: var(--loa-text-lg);
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: var(--loa-tracking-snug);
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 var(--loa-space-5) 0;
+  max-width: 58ch;
+  position: relative;
+  z-index: 1;
+}
+.slidev-layout.cover p,
+.slidev-layout.intro p {
+  color: rgba(255, 255, 255, 0.78);
+  position: relative;
+  z-index: 1;
+}
+.slidev-layout.cover code,
+.slidev-layout.intro code {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* ─── section layout — chapter dividers ─── */
+.slidev-layout.section {
+  background: linear-gradient(110deg,
+              var(--loa-violet-800) 0%,
+              var(--loa-violet-600) 100%);
+  color: #fff;
+  padding: var(--loa-space-8) var(--loa-space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+}
+.slidev-layout.section::before {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 4px;
+  background: var(--loa-cobalt-500);
+  border-radius: 2px;
+  position: absolute;
+  top: var(--loa-space-8);
+  left: var(--loa-space-8);
+}
+.slidev-layout.section h1 {
+  font-size: var(--loa-text-4xl);
+  font-weight: var(--loa-weight-bold);
+  letter-spacing: var(--loa-tracking-tight);
+  color: #fff;
+  line-height: 1.05;
+  max-width: 80%;
+  margin: 0;
+}
+.slidev-layout.section h2 {
+  font-size: var(--loa-text-2xl);
+  color: #fff;
+  margin: 0;
+}
+.slidev-layout.section p { color: rgba(255, 255, 255, 0.78); }
+
+/* ─── v-clicks reveal — inactive items ghosted, active dominates ─── */
+.slidev-vclick-target { transition: opacity 200ms ease, transform 200ms ease; }
+.slidev-vclick-hidden { opacity: 0.12 !important; transform: translateY(2px); }
+
+/* ─── embedded demo iframes — frame as part of the deck ─── */
+.slidev-layout iframe {
+  border: 1px solid var(--loa-rule) !important;
+  border-radius: var(--loa-radius-md) !important;
+  box-shadow: var(--loa-shadow-soft);
+  background: var(--loa-paper);
+}
+
+/* ─── Shiki on the paper surface ─── */
+.slidev-layout .shiki { background: transparent !important; }

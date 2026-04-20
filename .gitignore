@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.pnpm-store/
+.cache/
+.vite/
+.slidev-cache/
+.output/
+_site/
+.venv/
+**/__pycache__/
+sessions/*/slides.prod.md

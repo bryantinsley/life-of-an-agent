@@ -1,0 +1,189 @@
+/*
+ * Shared brand primitives — utility classes for elements that repeat
+ * across the deck and all demos (header chrome, eyebrow labels, chips, etc.)
+ */
+
+/* ─── eyebrow label ─── */
+.loa-eyebrow {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-xs);
+  font-weight: var(--loa-weight-semibold);
+  letter-spacing: var(--loa-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--loa-fg-muted);
+}
+
+/* ─── brand chrome (demo header bar) ─── */
+.loa-chrome {
+  display: flex;
+  align-items: center;
+  gap: var(--loa-space-4);
+  padding: var(--loa-space-3) var(--loa-space-5);
+  background: var(--loa-gradient-brand);
+  color: #fff;
+  border-radius: var(--loa-radius-md) var(--loa-radius-md) 0 0;
+}
+
+.loa-chrome-title {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-md);
+  font-weight: var(--loa-weight-semibold);
+  letter-spacing: var(--loa-tracking-snug);
+  line-height: 1;
+}
+
+.loa-chrome-sub {
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-xs);
+  font-weight: var(--loa-weight-regular);
+  letter-spacing: var(--loa-tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-top: 3px;
+}
+
+.loa-chrome-spacer {
+  flex: 1;
+}
+
+/* ─── BrandMark slot ─── */
+/* Empty violet-tinted square waiting for the real wordmark/logo.
+   Uses ::after to render a monogram placeholder until asset lands. */
+.loa-brandmark {
+  --size: 32px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: var(--loa-font-sans);
+  font-weight: var(--loa-weight-bold);
+  font-size: calc(var(--size) * 0.4);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+.loa-brandmark::after {
+  content: 'LoA';
+}
+.loa-brandmark.on-paper {
+  background: var(--loa-gradient-brand);
+  border-color: transparent;
+  color: #fff;
+}
+.loa-brandmark.is-large {
+  --size: 56px;
+  border-radius: 11px;
+}
+
+/* ─── chip (for filters, category pills) ─── */
+.loa-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--loa-radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: inherit;
+  font-size: var(--loa-text-xs);
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--loa-duration-fast) var(--loa-ease),
+              border-color var(--loa-duration-fast) var(--loa-ease);
+  user-select: none;
+}
+.loa-chip:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.loa-chip.is-off {
+  opacity: 0.4;
+}
+.loa-chip .loa-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* paper variant — for chips on the warm-white surface */
+.loa-chip.on-paper {
+  background: var(--loa-paper-dim);
+  border-color: var(--loa-rule);
+  color: var(--loa-ink);
+}
+.loa-chip.on-paper:hover {
+  background: var(--loa-violet-050);
+  border-color: var(--loa-violet-300);
+}
+
+/* ─── button — electric cobalt, reserved for primary actions ─── */
+.loa-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--loa-radius-md);
+  background: var(--loa-cobalt-600);
+  color: #fff;
+  font-family: var(--loa-font-sans);
+  font-size: var(--loa-text-sm);
+  font-weight: var(--loa-weight-medium);
+  letter-spacing: var(--loa-tracking-snug);
+  cursor: pointer;
+  transition: background var(--loa-duration-fast) var(--loa-ease),
+              transform var(--loa-duration-fast) var(--loa-ease);
+}
+.loa-button:hover {
+  background: var(--loa-cobalt-500);
+}
+.loa-button:active {
+  transform: translateY(1px);
+}
+.loa-button.is-ghost {
+  background: transparent;
+  color: var(--loa-cobalt-600);
+  border: 1px solid var(--loa-cobalt-600);
+}
+.loa-button.is-ghost:hover {
+  background: var(--loa-cobalt-100);
+}
+
+/* ─── inline code (in prose) ─── */
+.loa-scope :where(code:not(pre code)) {
+  font-family: var(--loa-font-mono);
+  font-size: 0.9em;
+  background: var(--loa-violet-050);
+  color: var(--loa-violet-800);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--loa-violet-100);
+}
+.loa-surface-env :where(code:not(pre code)) {
+  background: rgba(255, 255, 255, 0.13);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ─── footer note (honest-caveat callout) ─── */
+.loa-note {
+  font-size: var(--loa-text-sm);
+  line-height: var(--loa-leading-normal);
+  color: var(--loa-fg-muted);
+  padding: var(--loa-space-4);
+  background: var(--loa-violet-050);
+  border-left: 3px solid var(--loa-violet-400);
+  border-radius: 0 var(--loa-radius-md) var(--loa-radius-md) 0;
+}
+.loa-note b {
+  color: var(--loa-violet-800);
+  font-weight: var(--loa-weight-semibold);
+}

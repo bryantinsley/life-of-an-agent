@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent loop — one full turn, end to end</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hdr">
+        <div class="hdr-left">
+          <div class="title">One agent turn, end to end</div>
+          <div class="sub">A real-shape SRE debugging task. Step through and watch the loop: model emits → harness dispatches → result returns → model continues.</div>
+        </div>
+        <div class="hdr-right">
+          <a href="../" class="back">↩ all demos</a>
+        </div>
+      </header>
+
+      <section class="scenario">
+        <div class="scenario-label">user message</div>
+        <div class="scenario-body" id="scenario-body"></div>
+      </section>
+
+      <main class="loop" id="loop"></main>
+
+      <footer class="controls">
+        <button id="btn-prev" class="btn">← back</button>
+        <button id="btn-reset" class="btn ghost">reset</button>
+        <div class="step-indicator"><span id="step-cur">0</span> / <span id="step-total">0</span></div>
+        <button id="btn-auto" class="btn ghost">auto-play</button>
+        <button id="btn-next" class="btn primary">next →</button>
+      </footer>
+
+      <aside class="legend">
+        <div class="legend-title">legend — every box is a layer we'll bottom out</div>
+        <div class="legend-grid">
+          <div class="lg lg-think"><span class="dot"></span><b>model thinks</b> — tokens emitted into a hidden reasoning channel</div>
+          <div class="lg lg-tool"><span class="dot"></span><b>tool call</b> — structured tokens the harness recognizes</div>
+          <div class="lg lg-dispatch"><span class="dot"></span><b>harness dispatch</b> — code outside the model executes the call</div>
+          <div class="lg lg-result"><span class="dot"></span><b>tool result</b> — pasted back into context as if it were a message</div>
+          <div class="lg lg-final"><span class="dot"></span><b>final answer</b> — the model emits text instead of a tool call; loop ends</div>
+        </div>
+      </aside>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

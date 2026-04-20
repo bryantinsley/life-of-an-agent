@@ -1,0 +1,131 @@
+/*
+ * Life of an Agent — design tokens.
+ * Single source of truth: deck slides + demos + web landing all pull from here.
+ */
+
+:root {
+  /* ─── palette ─── */
+
+  /* violet — the environment / brand anchor */
+  --loa-violet-900: #2a1f5e;   /* deepest, reserved for heavy headers */
+  --loa-violet-800: #3d2e87;
+  --loa-violet-700: #4c3db0;
+  --loa-violet-600: #5a4bcf;   /* primary environment shade */
+  --loa-violet-500: #6b5dd3;   /* brand anchor (deck chrome, demo header) */
+  --loa-violet-400: #8575e5;
+  --loa-violet-300: #a59aec;
+  --loa-violet-200: #c7bff4;
+  --loa-violet-100: #ece8fa;
+  --loa-violet-050: #f5f2fc;
+
+  /* cobalt — electric emphasis accent (matches the reference template's blue) */
+  --loa-cobalt-700: #1a32c9;
+  --loa-cobalt-600: #2a4bff;   /* primary accent */
+  --loa-cobalt-500: #4d6bff;
+  --loa-cobalt-400: #7a90ff;
+  --loa-cobalt-100: #e4e9ff;
+
+  /* warm neutrals (slide surface, ink) */
+  --loa-paper: #faf9f6;         /* slide / content surface — warm off-white */
+  --loa-paper-dim: #f2efe7;
+  --loa-ink: #1a1530;           /* primary text — near-black w/ violet undertone */
+  --loa-ink-muted: #5a5470;
+  --loa-ink-dim: #8c8699;
+  --loa-rule: #e6e3ed;          /* hairline dividers */
+  --loa-rule-soft: #efecf4;
+
+  /* functional tint aliases */
+  --loa-bg: var(--loa-paper);
+  --loa-bg-env: var(--loa-violet-500);
+  --loa-fg: var(--loa-ink);
+  --loa-fg-muted: var(--loa-ink-muted);
+  --loa-accent: var(--loa-cobalt-600);
+  --loa-accent-soft: var(--loa-cobalt-100);
+  --loa-brand: var(--loa-violet-500);
+  --loa-brand-soft: var(--loa-violet-100);
+
+  /* gradients — reserved for hero / section moments, not every slide */
+  --loa-gradient-brand: linear-gradient(135deg, #5a4bcf 0%, #6b5dd3 45%, #8575e5 100%);
+  --loa-gradient-hero: linear-gradient(135deg, #3d2e87 0%, #5a4bcf 55%, #4d6bff 100%);
+  --loa-gradient-ink: linear-gradient(135deg, #1a1530 0%, #3d2e87 100%);
+
+  /* ─── type ─── */
+  --loa-font-sans: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --loa-font-mono: 'Geist Mono Variable', 'Geist Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --loa-font-display: var(--loa-font-sans);
+
+  /* type scale — scoped for a 980x552 slide canvas */
+  --loa-text-xs: 11px;
+  --loa-text-sm: 13px;
+  --loa-text-base: 16px;
+  --loa-text-md: 18px;
+  --loa-text-lg: 22px;
+  --loa-text-xl: 28px;
+  --loa-text-2xl: 36px;
+  --loa-text-3xl: 48px;
+  --loa-text-4xl: 64px;
+  --loa-text-5xl: 84px;
+
+  /* weights */
+  --loa-weight-regular: 400;
+  --loa-weight-medium: 500;
+  --loa-weight-semibold: 600;
+  --loa-weight-bold: 700;
+
+  /* tracking */
+  --loa-tracking-tight: -0.022em;
+  --loa-tracking-snug: -0.012em;
+  --loa-tracking-normal: 0;
+  --loa-tracking-eyebrow: 0.14em;      /* for ALL-CAPS labels */
+  --loa-tracking-wide: 0.04em;
+
+  /* leading */
+  --loa-leading-tight: 1.05;
+  --loa-leading-snug: 1.2;
+  --loa-leading-normal: 1.45;
+  --loa-leading-relaxed: 1.6;
+
+  /* ─── spacing (8px grid) ─── */
+  --loa-space-1: 4px;
+  --loa-space-2: 8px;
+  --loa-space-3: 12px;
+  --loa-space-4: 16px;
+  --loa-space-5: 24px;
+  --loa-space-6: 32px;
+  --loa-space-7: 48px;
+  --loa-space-8: 64px;
+  --loa-space-9: 96px;
+
+  /* ─── radii ─── */
+  --loa-radius-sm: 4px;
+  --loa-radius-md: 8px;
+  --loa-radius-lg: 14px;
+  --loa-radius-xl: 22px;
+  --loa-radius-pill: 999px;
+
+  /* ─── shadows — used sparingly ─── */
+  --loa-shadow-soft: 0 4px 24px -8px rgba(26, 21, 48, 0.14);
+  --loa-shadow-lift: 0 12px 40px -12px rgba(26, 21, 48, 0.22);
+  --loa-shadow-inset-rule: inset 0 -1px 0 var(--loa-rule);
+
+  /* ─── motion ─── */
+  --loa-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --loa-duration-fast: 120ms;
+  --loa-duration-base: 220ms;
+  --loa-duration-slow: 440ms;
+
+  /* ─── slide canvas constants (Slidev default is 980x552) ─── */
+  --loa-canvas-w: 980px;
+  --loa-canvas-h: 552px;
+  --loa-slide-pad-x: 64px;
+  --loa-slide-pad-y: 48px;
+}
+
+/* demo dark-content variant — for data-viz canvases on violet chrome */
+.loa-surface-env {
+  color-scheme: dark;
+  --loa-bg: var(--loa-violet-600);
+  --loa-fg: #f8f7fc;
+  --loa-fg-muted: rgba(248, 247, 252, 0.72);
+  --loa-rule: rgba(255, 255, 255, 0.16);
+}

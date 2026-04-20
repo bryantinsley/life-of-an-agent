@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tokenizer explorer — see what the model actually sees</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hdr">
+        <div>
+          <div class="title">Tokenizer explorer</div>
+          <div class="sub">Real BPE running entirely in your browser. No server call. Paste anything; watch the model's view.</div>
+        </div>
+        <a href="../" class="back">↩ all demos</a>
+      </header>
+
+      <section class="samples">
+        <div class="samples-label">try a sample</div>
+        <div class="samples-row" id="samples-row"></div>
+      </section>
+
+      <section class="input-section">
+        <label for="input" class="input-label">your text</label>
+        <textarea id="input" rows="4" placeholder="Type or paste anything…"></textarea>
+      </section>
+
+      <section class="stats">
+        <div class="stat">
+          <div class="stat-num" id="stat-chars">0</div>
+          <div class="stat-label">characters</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-bytes">0</div>
+          <div class="stat-label">UTF-8 bytes</div>
+        </div>
+        <div class="stat highlight">
+          <div class="stat-num" id="stat-tokens">0</div>
+          <div class="stat-label">tokens</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-ratio">—</div>
+          <div class="stat-label">chars per token</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-cost">$0.0000</div>
+          <div class="stat-label">≈ input cost <span class="stat-sub">(at $5 / 1M tokens)</span></div>
+        </div>
+      </section>
+
+      <section class="tokens-section">
+        <div class="tokens-label">how the tokenizer cut it up — hover any chunk for token id</div>
+        <div id="tokens" class="tokens"></div>
+      </section>
+
+      <aside class="footer-note">
+        <div><b>Tokenizer:</b> <code>cl100k_base</code> — the BPE used by GPT-4 family. Different models use different tokenizers (Gemini uses SentencePiece with ~256K pieces, shared with Gemma; Llama uses its own SentencePiece BPE), but the *family of behaviors* — sub-word, leading-space-sensitive, multilingually uneven — is shared across all of them.</div>
+        <div style="margin-top: 6px;"><b>Why this matters:</b> the token count is the bill, the latency, the context budget. Bytes do not predict tokens; they have to be measured.</div>
+      </aside>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

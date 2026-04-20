@@ -1,0 +1,20 @@
+{
+  "name": "life-of-an-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "How LLMs and Agents Actually Work — a 10-session SRE curriculum.",
+  "scripts": {
+    "dev:s1": "pnpm --filter ./sessions/01-foundations-i dev",
+    "build:s1": "pnpm --filter ./sessions/01-foundations-i build",
+    "dev:agent-loop": "pnpm --filter ./demos/agent-loop dev",
+    "dev:tokenizer": "pnpm --filter ./demos/tokenizer-explorer dev",
+    "dev:embeddings": "pnpm --filter ./demos/embedding-scatter dev",
+    "dev:residual": "pnpm --filter ./demos/residual-stream-animator dev",
+    "build:all": "pnpm -r --parallel build",
+    "build:site": "bash scripts/build-site.sh"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  }
+}
