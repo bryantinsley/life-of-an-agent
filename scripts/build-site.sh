@@ -44,10 +44,19 @@ sed \
 
 echo "==> build Slidev deck for S1 (--base $BASE_PATH/sessions/s1/)"
 pushd "$DECK_DIR" > /dev/null
-pnpm slidev build slides.prod.md --base "$BASE_PATH/sessions/s1/" --with-presenter --out dist > /dev/null
-cp -r dist/* "$SITE/sessions/s1/" 2>/dev/null || mkdir -p "$SITE/sessions/s1" && cp -r dist/* "$SITE/sessions/s1/"
+pnpm slidev build slides.prod.md --base "$BASE_PATH/sessions/s1/" --out dist > /dev/null
+mkdir -p "$SITE/sessions/s1"
+cp -r dist/. "$SITE/sessions/s1/"
 rm -f "$TMP_SLIDES"
 popd > /dev/null
+
+# /presenter/ is a client-side route inside the Slidev app. GitHub Pages
+# only uses the site-root 404.html for missing URLs (never subdirectory
+# 404s), so we stamp a presenter/index.html that re-boots the same SPA.
+# Slidev's own dist/404.html is already an SPA fallback copy of index.html.
+echo "==> stamp presenter SPA entry for GH Pages"
+mkdir -p "$SITE/sessions/s1/presenter"
+cp "$SITE/sessions/s1/404.html" "$SITE/sessions/s1/presenter/index.html"
 
 echo "==> build landing page (Vite, --base ./)"
 pushd "$ROOT/web" > /dev/null
