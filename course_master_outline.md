@@ -35,15 +35,32 @@ Consequences of this choice:
 1. **Foundations I — From Text to Vectors.** Agent loop preview, architecture map, tokens, embeddings, the residual stream.
 2. **Attention.** Q/K/V, softmax, multi-head, the KV cache as a natural consequence, O(n²).
 3. **The Transformer Block and Full Forward Pass.** Attention + FFN + residuals + norms, stacking, logits → token, sampling preview.
-4. **Pre-training.** Next-token prediction, scale, data, emergence, what "the model knows."
-5. **Post-training and RL.** SFT, RLHF, RLVR, how tool use is trained in, MoE callout.
-6. **Prefill and Decode.** The two phases, why they differ, prefix caching, what TTFT and tok/s actually measure.
-7. **Sampling and Serving.** Temperature, top-p, speculative decoding, continuous batching, paged attention.
-8. **Agents I — The Loop and Tools.** Model in a while loop, tool schemas, tool calls as tokens, system prompts, context assembly.
-9. **Agents II — Context Engineering and Failure Modes.** Context rot, tool loops, hallucinated tools, long-horizon tasks, evals.
+4. **Training (Pre + Post).** Next-token prediction, scale, emergence, knowledge cutoffs (~25 min). SFT, RLHF, RLVR as a survey (~15 min). MoE architectural callout (~5 min). RL deep dive deferred to agents.
+5. **Prefill and Decode.** The two phases, why they differ, prefix caching, what TTFT and tok/s actually measure.
+6. **Sampling and Serving.** Temperature, top-p, speculative decoding, continuous batching, paged attention.
+7. **Agents I — The Loop and Tools.** Model in a while loop, tool schemas, tool calls as tokens, system prompts, context assembly.
+8. **Agents II — Context Engineering.** Context rot, lost-in-the-middle, compaction, long-horizon tasks, what to keep / what to drop, cache-aware prompt structuring.
+9. **Agents III — Reliability, Failure Modes, Evals.** Tool loops, hallucinated tools, eval design, agent observability. Where deferred topics pay off (RL → tool use, prefix caching → economic viability, sampling → tool-call reliability, KV cache → context-engineering cost math).
 10. **Putting It All Together.** End-to-end walkthrough of one agent turn through every layer, where the field is going, catch-all Q&A.
 
-Shape: 1–3 build one concept (the transformer). 4–5 explain how it got good at what it does. 6–7 explain how it runs in production. 8–9 explain how it's wrapped to do useful work. 10 re-walks the whole stack.
+Shape: 1–3 build one concept (the transformer). 4 explains how it got good at what it does (compressed; full RL payoff deferred). 5–6 explain how it runs in production. 7–9 explain how it's wrapped to do useful work — three sessions because that's the part SREs touch daily. 10 re-walks the whole stack.
+
+**Decision log — arc balance shift (2026-04-20):** Original draft gave agents 2 sessions (~90 min). Shifted to 3 (~135 min) by merging old S4 (Pre-training) + S5 (Post-training and RL) into a single S4 "Training" that compresses RL to a survey. Reason: agents are what attendees touch daily; the theory-first bet still pays off, but a 3rd agent session creates room for the spiral pattern below — foundational concepts get briefly introduced where they architecturally belong, then revisited in the agent context where the "why does this matter" lands hardest. Capstone preserved at S10.
+
+## 3a. Spiral / Two-Pass Callbacks
+
+Several foundational concepts get the two-pass treatment: brief introduction at the architecturally correct point, full payoff later in the agent sessions where the operational stakes make them click. This lets foundations stay tight without losing depth.
+
+| Concept | First pass (brief) | Second pass (payoff) |
+|---|---|---|
+| **RL (RLHF, RLVR)** | S4 Training, ~5 min as a survey of post-training | S9 — how RL specifically unlocked reliable tool use; why tool-using models had to be trained, not prompted, into existence |
+| **KV cache** | S2 Attention (as natural consequence of math), S5 Prefill/Decode (memory math) | S8 Context Engineering — the cost math of context decisions; why every kept token costs decode bandwidth on every subsequent token |
+| **Sampling / decoding** | S3 (preview), S6 Sampling and Serving (knobs) | S9 — temperature for tool-call reliability, why agents typically run at low temp, when determinism matters and why it's hard |
+| **Prefix caching** | S5 Prefill/Decode (throughput optimization) | S9 — the economic enabler of agent loops (50-turn trajectory ≠ 50× single turn), and cache-aware system-prompt / tool-definition structuring as an SRE-relevant skill |
+
+How this shows up in deliverables: each first-pass slide includes a "we'll come back to this in S{N}" forward-pointer; each second-pass slide opens with a "remember from S{N}" callback. The ratchet is explicit, not implicit.
+
+> **Note:** Per-session detail in §6 below still reflects the pre-shift 10-session structure. Sessions 4, 7, 8, 9 need to be rewritten to match the new arc; sessions 1–3, 5, 6, 10 are largely unchanged but their numbering and handoff lines need updating. Defer the rewrite until other open questions (S1 scope, facilitator depth target) settle, since they may affect S1's time budget and the depth bar across the whole course.
 
 ## 4. Cross-Cutting Threads
 
