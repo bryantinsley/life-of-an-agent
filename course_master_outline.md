@@ -60,7 +60,9 @@ Several foundational concepts get the two-pass treatment: brief introduction at 
 
 How this shows up in deliverables: each first-pass slide includes a "we'll come back to this in S{N}" forward-pointer; each second-pass slide opens with a "remember from S{N}" callback. The ratchet is explicit, not implicit.
 
-> **Note:** Per-session detail in §6 below still reflects the pre-shift 10-session structure. Sessions 4, 7, 8, 9 need to be rewritten to match the new arc; sessions 1–3, 5, 6, 10 are largely unchanged but their numbering and handoff lines need updating. Defer the rewrite until other open questions (S1 scope, facilitator depth target) settle, since they may affect S1's time budget and the depth bar across the whole course.
+> **Note:** Per-session detail in §6 below still reflects the pre-shift 10-session structure. Sessions 4, 7, 8, 9 need to be rewritten to match the new arc; sessions 1–3, 5, 6, 10 are largely unchanged but their numbering and handoff lines need updating. Defer the rewrite until remaining open questions (Q5 safety/alignment, Q6 logistics) settle. Items to incorporate during the rewrite:
+> - **TPU vs GPU coverage** — brief in S4 Training (Google uses TPUs, most others GPUs, reason is software ecosystem not architectural superiority); deeper in S5 Prefill/Decode (why TPUs compete on inference — decode is memory-bandwidth-bound, both have HBM, systolic vs SIMT matters less when bandwidth dominates; Apple Silicon's unified memory fits the same story). Also serves as facilitator-training material for cross-vendor architectural fluency.
+> - **Verified Gemini claims** — the single-pass verification (see §10) produces a sources-table that the rewrite should use to recalibrate every Gemini callout.
 
 ## 4. Cross-Cutting Threads
 
@@ -629,5 +631,20 @@ Before each session, produce:
 - [ ] Facilitator's guide (annotated slides with speaker notes, expected questions, traps)
 - [ ] Pre-read (1,000–1,500 words, primes questions not answers)
 - [ ] Study prompt (paste-ready for Claude, adaptive, covers session + cumulative)
+- [ ] **Fact-check report** (web-grounded, sourced; see §10 for workflow)
 
-*Not in this document: the four deliverables themselves. Those are produced session by session, starting with session 1.*
+*Not in this document: the five deliverables themselves. Those are produced session by session, starting with session 1.*
+
+## 10. Fact-Checking Workflow
+
+Two distinct fact-checking activities, both web-grounded:
+
+**10.1 One-pass Gemini verification (whole-outline, done once before deliverables begin).**
+Every Gemini-specific claim currently in the outline is hedged from facilitator memory. Run a single web-research pass that produces a sources-table covering: TPU generations used (training and serving), tokenizer family, context window specifics, function calling / tool use, MoE status (confirmed vs widely-believed vs speculation), AgentSpace / Vertex AI agent tooling, multimodal support, anything else the outline asserts. Output: a markdown table with claim → status (confirmed / widely-believed / speculation / outdated) → source(s) → corrected hedging language. Used to recalibrate every Gemini callout during the per-session rewrite, and serves as facilitator-training material — Bryan is at Google, but knowing what the *external* world has and hasn't published is the relevant frame for an attendee-facing course.
+
+**10.2 Per-session fact-check pass (after each session's artifacts are created).**
+After slide deck, facilitator's guide, pre-read, and study prompt are drafted for a session, run a focused web-grounded fact-check. Scope: every factual claim in the artifacts — model specs, paper attributions, dates, benchmark numbers, vendor capabilities, infrastructure details, technique provenance. Output: a fact-check report listing each claim, verification status, source URL(s), and any required corrections. Required for each session before delivery. The point is not skepticism for its own sake — it's that overclaims to a Google SRE audience erode credibility for the rest of the course.
+
+**Sourcing standards:** primary sources first (vendor docs, technical reports, papers), reputable secondary second (well-cited blog posts, conference talks). Avoid LLM-generated summaries as sources. When a claim is "widely believed" but unconfirmed, name the believers (which labs / which credible analysts).
+
+**Decision log — fact-checking workflow (2026-04-20):** Added §10 and the 5th deliverable. Reason: the outline currently hedges Gemini claims from facilitator memory, and the audience is Google SREs who will catch overclaims. One-pass verification fixes the existing outline's claims; per-session fact-check prevents new ones from sneaking in. The verification pass also doubles as facilitator training — understanding the external-vs-internal information asymmetry is itself useful for someone teaching this course.
