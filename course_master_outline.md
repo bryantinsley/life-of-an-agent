@@ -23,7 +23,7 @@ Consequences of this choice:
 | Choice | Rationale |
 |---|---|
 | Minimal math notation | Audience ≠ ML researchers. Use notation only where it genuinely unlocks something. Prefer "the model computes a weighted average over previous tokens" to `softmax(QK^T/√d_k)V` unless the latter is load-bearing. |
-| Generic examples, Google callouts | Course ages better when generic; Google callouts land when attendees can connect to products they know. Frame Gemini specifics as "known" or "widely speculated" — do not overclaim. |
+| Generic examples, Google callouts | Course ages better when generic; Google callouts land when attendees can connect to products they know. Frame Gemini specifics as "known" or "widely speculated" — do not overclaim. Every Gemini claim passes through two gates: the one-pass verification sweep (§10.1, pre-production) and the per-session fact-check stage (§10.2, post-artifact). |
 | One SRE callout per session | Concrete operational tie-in, not shoehorned. Sessions 6–7 are SRE-rich; sessions 4–5 have thinner callouts. That is fine. |
 | Interactive HTML where useful | Clickable walkthroughs for things that benefit from them — tokenizer visualizer, attention viewer, prefill/decode timeline. Not every session needs one. |
 | Pre-read primes questions, not answers | Attendees arrive with mental hooks, not half-formed answers that have to be un-taught. Each pre-read explicitly plants 1–3 questions the session will resolve. |
@@ -604,7 +604,7 @@ The pre-read offers a paragraph of intuition for each and explicitly says "we'll
 |---|---|
 | Attendee frustration with theory-first | Acknowledge explicitly in session 1. Promise the payoff. Refer forward often. |
 | Math anxiety | Minimal notation. Never use Greek letters without introducing them. |
-| "Gemini does X" overclaim | Always hedge non-public architecture details as "widely believed" or "speculated." |
+| "Gemini does X" overclaim | Always hedge non-public architecture details as "widely believed" or "speculated." Enforcement isn't vibes — §10.1 is a mandatory one-pass web-grounded sweep over every Gemini claim in the outline before session production begins, §10.2 is a mandatory per-session fact-check with sources after artifacts are drafted. Both gates produce paper trails. |
 | Facilitator gap exposed by a sharp question | "Let me get back to you" is fine. Study prompts minimize but don't eliminate this. |
 | Running out of time | Pre-identify a cuttable 5-min segment per session. |
 | Q&A derails | 15-min Q&A with parking-lot flip chart. Facilitator's guide flags on-topic vs. next-session vs. out-of-scope. |

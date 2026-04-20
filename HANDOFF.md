@@ -49,6 +49,9 @@ Bryan's stated goals, in his words:
 - **Done:** Master outline, complete, in `course_master_outline.md`.
 - **Not done:** All per-session deliverables. Session 1 was about to be produced when this handoff was initiated.
 - **Open questions:** See Section 3a below. These are unresolved and must be asked before producing session 1.
+- **Pending pre-production work (mandatory before any session artifacts):**
+  - **One-pass Gemini verification sweep (§10.1 of master outline).** Web-grounded research pass over every Gemini/Google-infra claim currently in the outline — TPU generation lineage, tokenizer family, context window specifics across Gemini variants, MoE status, function-calling/AgentSpace specifics, multimodal support, training-hardware claims. Produces `notes/claims-ledger.md` with claim → status → source(s) → corrected hedging. Outline rewrite (sessions 4, 7, 8, 9) uses this ledger as authoritative. Sweep scope also covers the TPU-vs-GPU architectural thread flagged in §3a's rewrite-note — the "TPUs compete on inference, GPUs dominate training" story lands in the S4 SRE callout (training hardware realities) and the S5 Prefill/Decode chunk (inference hardware fit to compute-bound vs memory-bandwidth-bound phases), and doubles as Bryan's own training on the cross-vendor architectural distinctions.
+  - **Per-session fact-check stage (§10.2 of master outline).** After each session's four artifacts are drafted, run a web-grounded fact-check pass over every concrete claim (models, papers, dates, numbers, vendors, techniques). Produces `sessions/NN-.../fact-check.md` with sources and applied corrections. This is the 5th deliverable per session, not optional. Gating: no session ships to delivery without its fact-check report.
 
 ### 3a. Open Questions to Ask Bryan Before Producing Anything
 
