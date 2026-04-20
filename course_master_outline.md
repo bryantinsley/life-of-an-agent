@@ -27,8 +27,10 @@ Consequences of this choice:
 | Durability-first content | Bulk of every session lives in fundamentals with a 5–10+ year half-life: residual stream, attention math, prefill/decode asymmetry, the agent loop. Vendor specifics, model names, benchmark numbers, and SOTA highlights are kept thin and *isolatable* — they live in their own slides/segments so they can be refreshed without restructuring the session. Reason: LLM-specifics have a half-life of months; structuring the course around them guarantees rot. Operationalized through three layers — durable fundamentals, week-of revalidation (§10.2), and a recent-SOTA callout segment per session (§10.3). |
 | One SRE callout per session | Concrete operational tie-in, not shoehorned. Sessions 6–7 are SRE-rich; sessions 4–5 have thinner callouts. That is fine. |
 | Interactive HTML where useful | Clickable walkthroughs for things that benefit from them — tokenizer visualizer, attention viewer, prefill/decode timeline. Not every session needs one. |
-| Pre-read primes questions, not answers | Attendees arrive with mental hooks, not half-formed answers that have to be un-taught. Each pre-read explicitly plants 1–3 questions the session will resolve. |
-| Adaptive, cumulative study prompt per session | Each study prompt quizzes that session plus all prior. By session 10 you're being tested on the whole stack. Prompts ask Claude to flag mental-model errors, not just wrong answers. |
+| Pre-read primes questions, not answers — and is optional for noobs | Attendees arrive with mental hooks, not half-formed answers to un-teach. Each pre-read plants 1–3 questions the session will resolve. **A noob must be able to walk in cold and follow the session; pre-read is for motivated attendees who want a running start.** Cascade: S1 gets a bespoke pre-read (no prior content); S2+ pre-read = a pointer to the prior session's narrative companion + 1–3 optional external links. |
+| Adaptive cumulative study prompt — optional enrichment, not a corequisite | Each prompt quizzes that session plus all prior and asks Claude to flag mental-model errors. **Framing is critical: no attendee should feel "I haven't prepared so I can't show up."** It's a way to get more out of the sessions, not a barrier. By S10, a motivated user who worked through every prompt is being tested on the whole stack; one who hasn't is still welcome and can follow. |
+| Recorded (Google-internal) delivery, multi-artifact distribution | Every session is recorded; recordings stay internal, so on-camera tone can be more candid than what ships to public GitHub Pages. Slide text density is *moderate*, not sparse — recording + narrative companion + slides carry the weight together, so no single artifact has to be self-sufficient. Slide 1 of every deck links to the post-session narrative. Distribution bundle: slides + narrative + recording link. **Discipline:** candid on-camera asides (esp. Gemini internals) must not bleed into public artifacts; hedging rules from the "generic examples, Google callouts" row still apply to slides and narrative. |
+| Safety / alignment out of scope as a covered topic | This course teaches how the systems work, not their alignment properties. Bryan may produce a separate internal session on Google-specific safety/security work as a standalone offering; that material is not part of this curriculum and is not produced or referenced in this repo. Distinct from the recording row above: that's about *how candidly Bryan can speak*; this is about *what subjects the course covers*. No "safety/security boundaries when asked" sections in facilitator guides — internal recording + internal audience removes the need. |
 | Facilitator depth target: 3× attendee | Every session outline includes a "stretch" section — things you should know that attendees won't ask but a sharp one might. This is the forcing function you asked for. |
 
 ## 3. The Arc at a Glance
@@ -61,7 +63,19 @@ Several foundational concepts get the two-pass treatment: brief introduction at 
 
 How this shows up in deliverables: each first-pass slide includes a "we'll come back to this in S{N}" forward-pointer; each second-pass slide opens with a "remember from S{N}" callback. The ratchet is explicit, not implicit.
 
-> **Note:** Per-session detail in §6 below still reflects the pre-shift 10-session structure. Sessions 4, 7, 8, 9 need to be rewritten to match the new arc; sessions 1–3, 5, 6, 10 are largely unchanged but their numbering and handoff lines need updating. Defer the rewrite until remaining open questions (Q5 safety/alignment, Q6 logistics) settle. Items to incorporate during the rewrite:
+## 3b. Cadence and the Mid-Course Gap
+
+**Cadence:** 4 weekly sessions (S1–S4), then a **one-month gap**, then 6 weekly sessions (S5–S10).
+
+The gap lands at a clean narrative seam. S1–S4 answer "how did this thing come to be" (architecture through training). S5–S10 answer "how does it run and how do we wrap it" (serving through agents). The gap gives the first arc time to compost before the second arc begins.
+
+**Gap handling — milestone, not cliffhanger.** S4 closes with a satisfied-milestone framing: *"you now understand how this thing exists; take the month, when we come back we'll watch it run."* A cliffhanger across a month creates low-grade nagging rather than productive anticipation. S5 opens with a tight ~3-min "welcome back, here's where we left off" recap regardless of framing choice, so cliffhanger earns nothing.
+
+**Implications for study prompts across the gap:** the S4→S5 between-session prompt should explicitly signal "no homework; one thing to play with if you're curious" — attendees return after 4 weeks, and a prompt that feels obligatory will lose re-engagement.
+
+**Decision log — cadence and gap (2026-04-20):** 4+1+6 cadence with a one-month gap after S4. Milestone framing at S4 close, not cliffhanger. Reason: the arc's natural seam lands at S4/S5 (theory complete → production starts), and a month is long enough that cliffhanger-anxiety is hostile, not motivating. S5 gets a mandatory re-entry recap slot regardless.
+
+> **Note:** Per-session detail in §6 below still reflects the pre-shift 10-session structure. Sessions 4, 7, 8, 9 need to be rewritten to match the new arc; sessions 1–3, 5, 6, 10 are largely unchanged but their numbering and handoff lines need updating. All blocking open questions are now resolved (arc, S1 scope, depth, safety scope, logistics) — rewrite is unblocked. Items to incorporate during the rewrite:
 > - **TPU vs GPU coverage (consolidated, lands in S5)** — one cohesive ~10-min block in S5 Prefill/Decode covering the full arc: why GPUs dominate training (CUDA ecosystem maturity + market gravity, not architectural superiority), why TPUs compete on inference (decode is memory-bandwidth-bound, both have HBM, systolic vs SIMT matters less when bandwidth dominates), and why Apple Silicon plays in the inference space too (unified memory = no PCIe transfer for the model weights). S4 Training gets a one-line forward-reference ("Google trained Gemini on TPUs; we'll unpack what TPUs are and how they compete with GPUs in S5 when we look at inference, where the architectural story actually pays off"). Reason: splitting the story across two sessions risks neither half landing — the "training-on-GPU, inference-anywhere" arc is one narrative (economics + ecosystem + architecture), and S5 is where the architectural distinction earns its keep. Also serves as facilitator-training material for cross-vendor architectural fluency.
 > - **Verified Gemini claims** — the single-pass verification (see §10) produces a sources-table that the rewrite should use to recalibrate every Gemini callout.
 
@@ -583,7 +597,7 @@ The pre-read offers a paragraph of intuition for each and explicitly says "we'll
 - Long context pushing past 1M.
 - Multimodal (images, audio, video as tokens in the same residual stream).
 - Agentic systems (multiple agents, long-running, enterprise).
-- Open questions (interpretability, alignment, eval infrastructure).
+- Open questions (interpretability, eval infrastructure).
 
 **SRE callout:** The field moves fast. Which SRE skills age well? Systems thinking, observability, failure catalogs, capacity planning. What new skills emerge? Eval infrastructure, context management as code, LLM cost modeling.
 
@@ -629,11 +643,12 @@ For personal prep beyond attendee level:
 
 Before each session, produce:
 
-- [ ] **Slide deck** (Slidev source; see §11 for framework decision and repo layout) — includes inline speaker notes, hidden appendix slides for likely-questions / backup deep-dives, and a dedicated **Recent SOTA callout** segment (see §10.3)
+- [ ] **Slide deck** (Slidev source; see §11) — inline speaker notes written as narrative prose (see §11 narrative pipeline), hidden appendix slides for likely-questions / backup deep-dives, a dedicated **Recent SOTA callout** segment (§10.3), and slide 1 linking to the narrative companion
 - [ ] **Facilitator's guide** (the richer pre-session prep artifact — per-slide: what's on slide → what you say → what they'll ask → traps → where to defer. Slidev's inline `<!-- -->` notes are a terse at-the-podium *subset* of this.)
-- [ ] **Pre-read** (1,000–1,500 words, primes questions not answers)
-- [ ] **Study prompt** (paste-ready for Claude, adaptive, covers session + cumulative)
+- [ ] **Pre-read** — S1 bespoke (~1,000–1,500 words, primes questions not answers); S2+ are thin pointers to the prior session's narrative companion + 1–3 optional external links (see §2 pre-read cascade row)
+- [ ] **Study prompt** (paste-ready for Claude, adaptive, covers session + cumulative; framed as optional enrichment per §2)
 - [ ] **Fact-check report** (week-of, web-grounded, sourced; see §10.2 for workflow)
+- [ ] **Narrative companion doc** (post-session, linked from slide 1 of the deck; see §11 for the speaker-notes-as-narrative pipeline). Lets attendees recall the session in detail and doubles as the next session's pre-read source.
 
 *Interactive demos referenced by the deck live in `/demos/<name>/` as standalone apps, not as deliverables-per-session. Each demo is built once, embedded in whichever session needs it, and remains independently linkable post-lecture. See §11.*
 
@@ -699,12 +714,31 @@ life-of-an-agent/
 - Demos accept URL-param state (e.g., `?text=hello+world`, `?layer=5`) so a shared link lands on a specific configuration. This is what makes post-lecture screenshots into actual links.
 
 **Speaker notes and backup content:**
-- **Inline speaker notes** — Slidev `<!-- -->` blocks per slide. Terse at-the-podium prompts. The facilitator's guide (separate file) is the richer prep artifact; Slidev notes are a subset of it, extracted or hand-curated for brevity during live presentation.
+- **Inline speaker notes — written as narrative prose, not stage directions.** Slidev `<!-- -->` blocks per slide. Write them as full sentences, as if they were the paragraphs of the narrative companion doc. Rationale: see the narrative pipeline below — these notes are the source of truth for the post-session narrative, so "what you'd tell the attendee on this slide in prose" is the right authoring target. At podium-time the facilitator skims them as prompts; on paper they read as continuous prose.
 - **Backup / "likely questions" slides** — Slidev's `hide: true` frontmatter + appendix sections. Pre-answered deep-dives for each session's predicted questions. Not in the main linear flow; navigable via the presenter UI if the question lands.
 - **Presenter mode** — Slidev's presenter UI shows current slide + next slide + notes + timer in a separate window. Attendees see the clean deck.
+
+**Narrative companion pipeline.** Each session ships with a post-session `narrative.md` — a linearized prose doc attendees can use to recall the session in detail, with inline demo screenshots and graphics. It's generated, not written from scratch:
+
+1. **Author speaker notes as narrative prose** (see above) — this is the only new writing step.
+2. **Export** using `slidev export-notes` (or equivalent) — produces a sequential notes-by-slide artifact.
+3. **Enrich** — add a short session-intro paragraph, a session-outro ("next session we…") paragraph, inline demo thumbnails with captions linking to the standalone demo, and any graphics from the slides that carry meaning without voice-over. Enrichment is the only per-session prose-authoring work beyond speaker notes.
+4. **Cross-link** — slide 1 of the deck links to the narrative; the narrative links back to the deck and to each embedded demo's standalone page.
+
+This keeps the narrative and the deck from drifting — speaker notes are the single source of truth, and the outro paragraph of each narrative primes questions for the next session (which becomes the S2+ pre-read content; see §2 pre-read cascade row).
+
+**Recording and distribution:**
+- Every session is recorded. Recordings live internally at Google — **not** on GitHub Pages.
+- Because the recording carries voice-over, slides don't need to be self-sufficient; **moderate text density** is the right target (vs. sparse visual-first). Session 1 is an exception — its four interactive demos carry the content, so sparse slides + demos is correct there.
+- On-camera tone can be more candid about Gemini / Google-infra internals than the public artifacts. **Discipline:** that candid track must not bleed into slides, narrative, or any GitHub Pages artifact — hedging rules (§2 "generic examples, Google callouts") apply to everything public.
+- Attendee distribution bundle per session: slides link (GitHub Pages) + narrative link (GitHub Pages) + recording link (internal).
 
 **Visual coherence:** one shared Slidev theme across all 10 sessions (palette, typography, transitions). Demos use a shared style wrapper (CSS variables) so embedded-in-slide and standalone experiences feel unified.
 
 **Hosting and deploy:** GitHub Pages. GitHub Actions workflow builds each Slidev deck and each demo independently, composes them under one Pages site. Push-to-main triggers deploy. Staging previews via PR deploy-previews if needed later.
 
 **Decision log — hosting and demo as first-class artifacts (2026-04-20):** GitHub Pages is the right call because the repo is already on GitHub, hosting is free, and every artifact is static. Demos being first-class (not slide-embedded only) resolves the "wow compounds after the lecture" requirement directly: people click around, share configurations, and the course becomes a persistent reference rather than a one-shot talk. The two-way navigation (slide ↔ demo) preserves pedagogical context — you can find a demo standalone *or* trace it back to where it was taught.
+
+**Decision log — narrative companion, recording, and multi-artifact distribution (2026-04-20):** Added the narrative companion as a 6th per-session deliverable, authored via the speaker-notes-as-narrative pipeline so the marginal production cost is "enrich the export," not "write a parallel doc." Slide 1 of each deck links to the narrative; the narrative's outro paragraph primes the next session and becomes its S2+ pre-read content (S1 pre-read is bespoke because there's no prior narrative). Reason: user wants attendees to recall sessions in detail post-delivery *and* a lightweight pre-read that doesn't gate noobs — a single well-structured narrative solves both when the outro is written with priming in mind. Recording is internal-only, which (a) allows moderate slide text density rather than sparse-visual-only (the usual "facilitator-driven" assumption doesn't apply when a recording is available for review), and (b) allows more candid on-camera asides — with strict discipline that candid content does not bleed into public slides or narrative.
+
+**Decision log — safety/alignment scope (2026-04-20):** Omitted entirely from the public course. Any safety/security coverage the facilitator wants to give is handled off-the-cuff in the room, or in a separately-crafted internal session that lives outside this repo. Reason: the public course is about *how LLMs and agents work*; Google-specific safety and security is its own topic and its own audience gate. Not threaded through S5/S9/S10, not appended as S11, not in the facilitator guide. Keeps the public artifacts focused and avoids a half-covered topic that would underserve either goal.

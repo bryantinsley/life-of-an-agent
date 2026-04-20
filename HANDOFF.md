@@ -9,11 +9,12 @@ life-of-an-agent/
 ├── course_master_outline.md      ← the master doc (authoritative)
 ├── sessions/
 │   ├── 01-foundations-i/
-│   │   ├── slides.md             ← Slidev source; speaker notes inline as <!-- --> blocks
+│   │   ├── slides.md             ← Slidev source; speaker notes inline as <!-- --> blocks, authored as narrative prose
 │   │   ├── facilitator-guide.md  ← richer pre-session prep (Slidev notes are a subset of this)
-│   │   ├── pre-read.md
+│   │   ├── pre-read.md           ← S1 bespoke; S2+ are thin pointers to prior narrative + optional links
 │   │   ├── study-prompt.md
-│   │   └── fact-check.md         ← week-of, web-grounded, sourced (§10.2)
+│   │   ├── fact-check.md         ← week-of, web-grounded, sourced (§10.2)
+│   │   └── narrative.md          ← post-session companion; linked from slide 1; derived from speaker notes + enrichment (§11)
 │   ├── 02-attention/
 │   └── ...
 ├── demos/                        ← first-class standalone interactive demos
@@ -36,12 +37,14 @@ life-of-an-agent/
 
 Bryan is an SRE at Google building a 10-session internal course teaching his team how LLMs and agents actually work. Each session is 1 hour: 45 min material, 15 min Q&A. The course is theory-and-foundations-first, software-engineering-last — deliberately modeled on old-school CS curricula rather than the current "how to prompt" style. Agents come at the end, after the attendees understand the transformer from tokens up.
 
-The four per-session deliverables are:
+The six per-session deliverables are:
 
-1. **Slide deck** (HTML, interactive where it adds value)
+1. **Slide deck** (Slidev source, interactive demos via iframe to `/demos/<name>/`)
 2. **Facilitator's guide** (annotated with speaker notes, expected questions, traps)
-3. **Pre-read** (~1,000–1,500 words, primes questions not answers)
-4. **Study prompt** (paste-ready, asks Claude to quiz Bryan adaptively, cumulative across sessions)
+3. **Pre-read** — S1 bespoke (~1,000–1,500 words, primes questions not answers); S2+ are thin pointers to the prior session's narrative + 1–3 optional external links
+4. **Study prompt** (paste-ready, asks Claude to quiz Bryan adaptively, cumulative across sessions; framed as optional enrichment, not a corequisite)
+5. **Fact-check report** (week-of, web-grounded, sourced; see outline §10.2)
+6. **Narrative companion** (post-session doc linked from slide 1; derived from speaker-notes-as-narrative + enrichment; see outline §11)
 
 Bryan's stated goals, in his words:
 - "Build as much depth as you can without assuming everyone walks out as an ML researcher."
@@ -64,11 +67,21 @@ Bryan's stated goals, in his words:
   - **One-pass Gemini verification sweep (§10.1 of master outline).** Web-grounded research pass over every Gemini/Google-infra claim currently in the outline — TPU generation lineage, tokenizer family, context window specifics across Gemini variants, MoE status, function-calling/AgentSpace specifics, multimodal support, training-hardware claims. Produces `notes/claims-ledger.md` with claim → status → source(s) → corrected hedging → **last-verified date**. Entries with last-verified > ~60 days at delivery time, or with an intervening vendor release, must be re-checked in §10.2. Outline rewrite (sessions 4, 7, 8, 9) uses this ledger as authoritative. Sweep scope also covers the TPU-vs-GPU architectural thread — consolidated into one ~10-min S5 block (with a one-line S4 forward-reference) covering why GPUs dominate training, why TPUs compete on inference, and where Apple Silicon fits. Doubles as Bryan's own training on cross-vendor architectural distinctions.
   - **Three-layer staleness defense baked into production cadence (§10).** (a) Durability-first content principle (§2) — the body of every session lives in 5–10+ year fundamentals; vendor specifics and benchmark numbers are kept thin and isolatable. (b) Week-of revalidation (§10.2) — the 5th deliverable, run the week of presentation (not at draft time) so it captures last-minute releases. Produces `sessions/NN-.../fact-check.md` with sources, corrections, and a fresh last-verified date. Gating: no session ships without it. (c) Recent SOTA callout (§10.3) — every session includes a 2–4 min content slot covering relevant developments from the last week-to-month, compiled in the same research swing as the §10.2 revalidation. Lives in its own slide(s) so it's hot-swappable.
 
-### 3a. Open Questions to Ask Bryan Before Producing Anything
+### 3a. Open Questions — All Resolved (2026-04-20)
 
-These were raised in the originating conversation but not answered before handoff. **Bryan has explicitly asked that the new session open by asking these, well-informed — it's how he'll gauge handoff fidelity.** If you skip them or ask them vaguely, you've failed the handoff.
+All six questions originally posed to Bryan have been resolved. Keeping the full record below for future-handoff traceability; see the decision logs in the master outline (§3 arc shift, §3b cadence, §6 S1 scope, §10 fact-checking, §11 slide framework / narrative / recording / safety scope) for the authoritative decisions. The "Why this matters" notes are preserved so a future handoff can see the decision context, not just the outcome.
 
-Ask them *after* confirming you've read the handoff and master outline, and *in the order below* — earlier answers may affect later ones. Questions marked **BLOCKER** must be resolved before any session deliverables are produced (they affect session numbering or first-session calibration). Others can be deferred if Bryan prefers, but flag the assumptions you're making.
+**Resolved decisions in one glance:**
+- Q1 (arc balance) → shifted to 3 agent sessions; S4+S5 of original outline merged into one S4 "Training" that surveys RL. Capstone preserved at S10. See outline §3 decision log.
+- Q2 (S1 scope) → 45-min content / 60-min slot as the universal budget; S1 is 4 × 10-min interactives + 5-min territory closer with the architecture map moved from opening scaffolding to anticipation-engine. See outline §6 S1 decision log.
+- Q3 (Gemini verification) → three-layer defense: one-pass ledger (§10.1) + week-of revalidation (§10.2, 5th deliverable) + SOTA callout segment (§10.3). TPU/GPU/Apple Silicon arc consolidated into one ~10-min S5 block.
+- Q4 (depth target) → 3× confirmed as stated; no change.
+- Q5 (safety/alignment) → omitted from the public course entirely. Any safety coverage is off-the-cuff in the room or in a separately-crafted internal session outside this repo. See outline §11 safety-scope decision log.
+- Q6 (logistics) → (a) slides + narrative + recording link distributed post-session; slide 1 of the deck links to the narrative; (b) recorded, internal-only — allows moderate slide text density and more candid on-camera tone, with strict discipline that candid content stays out of public artifacts; (c) cadence is 4 weekly + 1-month gap + 6 weekly; study prompts are explicitly optional enrichment, not a corequisite, especially across the gap. See outline §2 delivery row, §3b cadence, §11 recording-and-narrative decision log.
+
+---
+
+**Original open-questions section preserved below for traceability. Do not re-ask. Questions marked BLOCKER were resolved before any session deliverables were produced.**
 
 **1. [BLOCKER] Arc balance — is agents getting enough time?**
 Sessions 8–9 currently give agents ~90 min total at the end of a 10-session course. Given agents are what attendees actually use day-to-day, that may be light. Options:
@@ -145,15 +158,27 @@ Bryan writes in a direct, slightly rough style — typos intact, thinks out loud
 
 **What to produce for each deliverable:**
 
-**Slide decks:** Slidev source (`slides.md` per session). Markdown-first with Vue component slots. Minimal text per slide — facilitator-driven course. Shared theme across all 10 sessions for visual coherence. Inline `<!-- -->` speaker-note blocks on every slide (terse at-the-podium prompts — the full prep lives in `facilitator-guide.md`). Hidden appendix slides (`hide: true`) for likely-questions and backup deep-dives — navigable via Slidev's presenter UI if a question lands. Interactive demos are **not** embedded inline as Vue components; they live as standalone apps under `/demos/<name>/` and are embedded in slides via iframe, with an "↗ open standalone" affordance so attendees can click into them independently after the lecture. See outline §11 for the full production stack, repo layout, and two-way slide↔demo navigation.
+**Slide decks:** Slidev source (`slides.md` per session). Markdown-first with Vue component slots. **Moderate text density** — every session is recorded (internal-only), so slides don't have to be self-sufficient; recording + narrative companion + slides together carry the weight. (Exception: S1 is sparse-visual-first because its four interactive demos carry the pedagogical load.) Slide 1 of every deck links to the narrative companion. Shared theme across all 10 sessions for visual coherence.
+
+Inline `<!-- -->` speaker-note blocks on every slide — **authored as narrative prose, not stage directions.** Rationale: these notes are the source of truth for the post-session narrative companion (via `slidev export-notes` + enrichment), so writing them as continuous prose is the only way to avoid authoring the narrative twice. At podium-time the facilitator skims them as prompts; on paper they read as paragraphs. The richer pre-session prep (what they'll ask, traps, deferrals) lives in `facilitator-guide.md`.
+
+Hidden appendix slides (`hide: true`) for likely-questions and backup deep-dives — navigable via Slidev's presenter UI if a question lands.
+
+Interactive demos are **not** embedded inline as Vue components; they live as standalone apps under `/demos/<name>/` and are embedded in slides via iframe, with an "↗ open standalone" affordance so attendees can click into them independently after the lecture. See outline §11 for the full production stack, repo layout, and two-way slide↔demo navigation.
+
+**Narrative companion doc (`narrative.md`):** Post-session prose doc that lets attendees recall the session in detail and doubles as the next session's pre-read source. **Derived, not hand-written.** Pipeline:
+1. Author speaker notes as narrative prose (only new writing step).
+2. Export with `slidev export-notes` (or equivalent) → sequential notes-by-slide artifact.
+3. Enrich: short session-intro paragraph, session-outro paragraph (primes next session's questions — this becomes S(N+1)'s pre-read content), inline demo thumbnails with captions linking to standalone demos, key graphics from the slides that carry meaning without voice-over.
+4. Cross-link: slide 1 → narrative; narrative → deck + each demo's standalone page.
+
+The outro paragraph is load-bearing: it's where the "priming 1–3 questions" role of the pre-read gets satisfied in the cascade. Write it with that dual purpose in mind.
 
 **Facilitator's guides:** Markdown. Per-slide structure: *What's on the slide* → *What you say* → *What they'll ask* → *What to watch for (misconceptions/traps)* → *Where to defer* ("that's next session"). Length matters less than density.
 
-**Pre-reads:** Markdown. 1,000–1,500 words. Conversational tone, not textbook. Structure:
-1. Hook (why this matters)
-2. 1–3 priming questions the session will answer
-3. Short intuition for each (a paragraph, not an explanation)
-4. "Come prepared to discuss:" ending with a provocation, not a summary
+**Pre-reads:**
+- **S1:** bespoke markdown, 1,000–1,500 words, conversational tone. Structure: (1) hook, (2) 1–3 priming questions, (3) short intuition per question, (4) closing provocation. Must not pre-teach. **Must not be required for a noob** — motivated attendees get a running start; unprepared attendees can still follow S1 cold.
+- **S2+:** thin `pre-read.md` = pointer to the prior session's `narrative.md` (specifically the outro paragraph, which was written as priming) + 1–3 optional external links for motivated attendees. No fresh prose authoring required per session.
 
 **Study prompts:** Markdown, paste-ready. Structure:
 1. Role setup for Claude (what to do, how to grade, how to push)
