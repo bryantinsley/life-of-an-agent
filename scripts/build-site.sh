@@ -16,7 +16,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SITE="$ROOT/_site"
-BASE_PATH="${PAGES_BASE:-/life-of-an-agent}"   # Override via env when testing locally.
+BASE_PATH="${PAGES_BASE-/life-of-an-agent}"   # Override via env when testing locally. Use `-` (not `:-`) so PAGES_BASE="" is honored.
 
 echo "==> clean previous build output"
 rm -rf "$SITE"
