@@ -2,20 +2,31 @@
 
 **Purpose of this document:** Everything a new Claude session needs to continue building this 10-session SRE course on how LLMs and agents work, at the same quality level as the originating conversation. Read top to bottom before producing anything.
 
-**Project repo layout (suggested):**
+**Project repo layout (locked; see outline §11):**
 ```
 life-of-an-agent/
 ├── HANDOFF.md                    ← this file
 ├── course_master_outline.md      ← the master doc (authoritative)
 ├── sessions/
 │   ├── 01-foundations-i/
-│   │   ├── slides.html
-│   │   ├── facilitator-guide.md
+│   │   ├── slides.md             ← Slidev source; speaker notes inline as <!-- --> blocks
+│   │   ├── facilitator-guide.md  ← richer pre-session prep (Slidev notes are a subset of this)
 │   │   ├── pre-read.md
-│   │   └── study-prompt.md
+│   │   ├── study-prompt.md
+│   │   └── fact-check.md         ← week-of, web-grounded, sourced (§10.2)
 │   ├── 02-attention/
 │   └── ...
+├── demos/                        ← first-class standalone interactive demos
+│   ├── tokenizer-explorer/       ← own URL, embedded in S1 via iframe
+│   ├── attention-viz/
+│   └── ...
+├── web/
+│   ├── index.md                  ← course landing page (syllabus + session cards)
+│   └── demos.md                  ← gallery index (filterable by session/topic)
+├── .github/workflows/
+│   └── deploy.yml                ← builds decks + demos, deploys to GitHub Pages
 └── notes/
+    ├── claims-ledger.md          ← §10.1 one-pass Gemini verification output
     └── decisions.md              ← running log of changes
 ```
 
@@ -134,7 +145,7 @@ Bryan writes in a direct, slightly rough style — typos intact, thinks out loud
 
 **What to produce for each deliverable:**
 
-**Slide decks:** HTML, single file. Interactive where it earns its place. Minimal text per slide — this is a facilitator-driven course, not a self-paced one. Speaker notes live in the facilitator guide, not the slides themselves. Use CSS for clean typography, no libraries beyond what's needed for interactivity. Match the palette across all 10 sessions for visual coherence.
+**Slide decks:** Slidev source (`slides.md` per session). Markdown-first with Vue component slots. Minimal text per slide — facilitator-driven course. Shared theme across all 10 sessions for visual coherence. Inline `<!-- -->` speaker-note blocks on every slide (terse at-the-podium prompts — the full prep lives in `facilitator-guide.md`). Hidden appendix slides (`hide: true`) for likely-questions and backup deep-dives — navigable via Slidev's presenter UI if a question lands. Interactive demos are **not** embedded inline as Vue components; they live as standalone apps under `/demos/<name>/` and are embedded in slides via iframe, with an "↗ open standalone" affordance so attendees can click into them independently after the lecture. See outline §11 for the full production stack, repo layout, and two-way slide↔demo navigation.
 
 **Facilitator's guides:** Markdown. Per-slide structure: *What's on the slide* → *What you say* → *What they'll ask* → *What to watch for (misconceptions/traps)* → *Where to defer* ("that's next session"). Length matters less than density.
 
@@ -204,7 +215,6 @@ Distinct from the open questions in Section 3a, which are blocking. These are mi
 
 - **Is there a follow-up course planned?** Affects how much to leave as "we'd cover this next time" in session 10.
 - **Does "SRE" here mean classical Google SRE or product-embedded SRE?** May shift operational-content weight. Default: classical, unless Bryan says otherwise.
-- **Preferred tooling for the slide decks** — plain HTML/CSS/JS has been assumed. If Bryan wants Reveal.js, Slidev, Google Slides export, etc., ask.
 
 ---
 

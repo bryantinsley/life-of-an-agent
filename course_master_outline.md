@@ -629,13 +629,15 @@ For personal prep beyond attendee level:
 
 Before each session, produce:
 
-- [ ] Slide deck (HTML-interactive where applicable) — includes a dedicated **Recent SOTA callout** segment (see §10.3)
-- [ ] Facilitator's guide (annotated slides with speaker notes, expected questions, traps)
-- [ ] Pre-read (1,000–1,500 words, primes questions not answers)
-- [ ] Study prompt (paste-ready for Claude, adaptive, covers session + cumulative)
+- [ ] **Slide deck** (Slidev source; see §11 for framework decision and repo layout) — includes inline speaker notes, hidden appendix slides for likely-questions / backup deep-dives, and a dedicated **Recent SOTA callout** segment (see §10.3)
+- [ ] **Facilitator's guide** (the richer pre-session prep artifact — per-slide: what's on slide → what you say → what they'll ask → traps → where to defer. Slidev's inline `<!-- -->` notes are a terse at-the-podium *subset* of this.)
+- [ ] **Pre-read** (1,000–1,500 words, primes questions not answers)
+- [ ] **Study prompt** (paste-ready for Claude, adaptive, covers session + cumulative)
 - [ ] **Fact-check report** (week-of, web-grounded, sourced; see §10.2 for workflow)
 
-*Not in this document: the five deliverables themselves. Those are produced session by session, starting with session 1.*
+*Interactive demos referenced by the deck live in `/demos/<name>/` as standalone apps, not as deliverables-per-session. Each demo is built once, embedded in whichever session needs it, and remains independently linkable post-lecture. See §11.*
+
+*Not in this document: the deliverables themselves. Those are produced session by session, starting with session 1.*
 
 ## 10. Fact-Checking and Currency Workflow
 
@@ -655,3 +657,54 @@ Each session includes an explicit segment — typically 2–4 minutes, placed wh
 **Sourcing standards:** primary sources first (vendor docs, technical reports, papers), reputable secondary second (well-cited blog posts, conference talks). Avoid LLM-generated summaries as sources. When a claim is "widely believed" but unconfirmed, name the believers (which labs / which credible analysts).
 
 **Decision log — fact-checking workflow (2026-04-20):** Three-layer staleness defense. Added §10 and the 5th deliverable. Reason: outline hedges Gemini claims from facilitator memory; audience is Google SREs who will catch overclaims; LLM-specifics rot fast. The strategy is durability + week-of revalidation + explicit "what's new" segment. Layer 1 (one-pass) fixes the existing outline's claims and produces a dated ledger. Layer 2 (week-of) catches drift just before delivery and is timed deliberately late so it captures last-minute releases. Layer 3 (SOTA callout) inverts the staleness problem — instead of trying to keep the body fresh, isolate freshness into its own slot where it belongs. Together with the durability-first content principle (§2), the course's body ages slowly and the dated parts are clearly marked as such.
+
+## 11. Production Stack and Hosting
+
+**Framework:** Slidev for all slide decks. **Hosting:** GitHub Pages, deployed via GitHub Actions. **Interactive demos:** first-class standalone apps under `/demos/<name>/`, embedded into slides via iframe and also discoverable independently through a `/demos/` gallery index.
+
+**Decision log — slide framework and demo architecture (2026-04-20):** The "wow" factor for this course compounds *after* the lecture — people should be able to click around demos on their own, share links, screenshot interesting configurations. That points at two architectural moves, independent of framework choice:
+
+1. **Demos are standalone apps with their own URLs**, not buried inside slide-mode. Embedding in slides is one use case; the demo must also stand on its own.
+2. **Two-way navigation** between deck and demo: from a slide, "open standalone"; from a demo, "seen in Session N, slide M." Plus a `/demos/` index gallery so the collection is browsable without knowing which session introduced what.
+
+Within that architecture, Slidev is the right authoring framework because its ergonomics (Markdown-first + hot reload + Vue component slots + first-class presenter mode with inline speaker notes + Monaco + Mermaid + LaTeX) give the fastest iteration loop. Framework choice isn't the bottleneck for wow — demo polish and discoverability are — but faster iteration translates into more polish per demo, which is the indirect edge. Reveal.js is a viable fallback with longer battle-testing but slower authoring; Spectacle is only worth it if every demo is React-tight.
+
+**Repo layout:**
+```
+life-of-an-agent/
+├── sessions/
+│   ├── 01-foundations-i/
+│   │   ├── slides.md              (Slidev source; speaker notes inline as <!-- --> blocks; hidden appendix slides for likely-Qs and backup deep-dives)
+│   │   ├── facilitator-guide.md   (richer pre-session prep; Slidev notes are a terse subset of this)
+│   │   ├── pre-read.md
+│   │   ├── study-prompt.md
+│   │   └── fact-check.md          (§10.2)
+│   └── ...
+├── demos/
+│   ├── tokenizer-explorer/        (standalone Vite app; own URL)
+│   ├── attention-viz/
+│   ├── prefill-decode-timeline/
+│   └── ...
+├── web/
+│   ├── index.md                   (course landing page — syllabus + session cards)
+│   └── demos.md                   (gallery index — filterable by session/topic)
+└── .github/workflows/
+    └── deploy.yml                 (builds Slidev decks + demos, deploys to Pages under one site)
+```
+
+**Two-way navigation:**
+- Each slide embedding a demo shows it in an iframe with a visible "↗ open standalone" link in the corner.
+- Each demo page has a breadcrumb — "↩ introduced in Session 3, slide 7" — deep-linking back to the slide.
+- `/demos/` index: gallery view with session tags, one-line descriptions, and animated/static previews. Filterable.
+- Demos accept URL-param state (e.g., `?text=hello+world`, `?layer=5`) so a shared link lands on a specific configuration. This is what makes post-lecture screenshots into actual links.
+
+**Speaker notes and backup content:**
+- **Inline speaker notes** — Slidev `<!-- -->` blocks per slide. Terse at-the-podium prompts. The facilitator's guide (separate file) is the richer prep artifact; Slidev notes are a subset of it, extracted or hand-curated for brevity during live presentation.
+- **Backup / "likely questions" slides** — Slidev's `hide: true` frontmatter + appendix sections. Pre-answered deep-dives for each session's predicted questions. Not in the main linear flow; navigable via the presenter UI if the question lands.
+- **Presenter mode** — Slidev's presenter UI shows current slide + next slide + notes + timer in a separate window. Attendees see the clean deck.
+
+**Visual coherence:** one shared Slidev theme across all 10 sessions (palette, typography, transitions). Demos use a shared style wrapper (CSS variables) so embedded-in-slide and standalone experiences feel unified.
+
+**Hosting and deploy:** GitHub Pages. GitHub Actions workflow builds each Slidev deck and each demo independently, composes them under one Pages site. Push-to-main triggers deploy. Staging previews via PR deploy-previews if needed later.
+
+**Decision log — hosting and demo as first-class artifacts (2026-04-20):** GitHub Pages is the right call because the repo is already on GitHub, hosting is free, and every artifact is static. Demos being first-class (not slide-embedded only) resolves the "wow compounds after the lecture" requirement directly: people click around, share configurations, and the course becomes a persistent reference rather than a one-shot talk. The two-way navigation (slide ↔ demo) preserves pedagogical context — you can find a demo standalone *or* trace it back to where it was taught.
