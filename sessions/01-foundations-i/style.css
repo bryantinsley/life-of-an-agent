@@ -303,3 +303,24 @@ html, body, #app {
 
 /* ─── Shiki on the paper surface ─── */
 .slidev-layout .shiki { background: transparent !important; }
+
+/* ─── Slidev chrome — make the stock nav quiet on our surfaces ─── */
+/* Bottom-left controls bar: fade until hovered so it's not a persistent list. */
+.slidev-nav-controls,
+.slidev-controls {
+  opacity: 0.12;
+  transition: opacity var(--loa-duration-base) var(--loa-ease);
+}
+.slidev-nav-controls:hover,
+.slidev-controls:hover { opacity: 1; }
+
+/* Overview mode — restyle the background so the tiled slides sit on paper, not on the raw black default. */
+.slidev-overview {
+  background: var(--loa-paper) !important;
+  color: var(--loa-ink);
+}
+.slidev-overview-card {
+  border: 1px solid var(--loa-rule);
+  border-radius: var(--loa-radius-md);
+  box-shadow: var(--loa-shadow-soft);
+}
