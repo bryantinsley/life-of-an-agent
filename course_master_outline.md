@@ -33,6 +33,8 @@ Consequences of this choice:
 | Safety / alignment out of scope as a covered topic | This course teaches how the systems work, not their alignment properties. Bryan may produce a separate internal session on Google-specific safety/security work as a standalone offering; that material is not part of this curriculum and is not produced or referenced in this repo. Distinct from the recording row above: that's about *how candidly Bryan can speak*; this is about *what subjects the course covers*. No "safety/security boundaries when asked" sections in facilitator guides — internal recording + internal audience removes the need. |
 | Facilitator depth target: 3× attendee | Every session outline includes a "stretch" section — things you should know that attendees won't ask but a sharp one might. This is the forcing function you asked for. |
 
+**Decision log — distribution model, attendee-anxiety floor, and content scope (2026-04-20):** Four §2 rows added/reframed in one pass after Q5/Q6 resolved. (1) Pre-read reframed as optional with a S1-bespoke / S2+-pointer cascade — reason: a noob must be able to walk in cold; a required pre-read becomes an attendance barrier. (2) Study prompt reframed as optional enrichment, never a corequisite — reason: explicit user concern that "I haven't prepared so I don't want to go" is the failure mode to design against, especially across the S4→S5 month gap. (3) Recorded-Google-internal delivery row added — recordings allow more candid on-camera tone and moderate (not sparse) slide density, but the discipline that public artifacts stay hedged is non-negotiable. (4) Safety/alignment scope row added — out of scope as a covered topic; if there's a Google-internal safety session it lives outside this repo. The four rows together define the attendee experience: low-friction entry, multi-artifact recall, candid-in-room / hedged-in-public, fundamentals-not-alignment.
+
 ## 3. The Arc at a Glance
 
 1. **Foundations I — From Text to Vectors.** Agent loop preview, architecture map, tokens, embeddings, the residual stream.
@@ -689,11 +691,12 @@ Within that architecture, Slidev is the right authoring framework because its er
 life-of-an-agent/
 ├── sessions/
 │   ├── 01-foundations-i/
-│   │   ├── slides.md              (Slidev source; speaker notes inline as <!-- --> blocks; hidden appendix slides for likely-Qs and backup deep-dives)
+│   │   ├── slides.md              (Slidev source; speaker notes inline as <!-- --> blocks, authored as narrative prose — see narrative pipeline below; hidden appendix slides for likely-Qs and backup deep-dives)
 │   │   ├── facilitator-guide.md   (richer pre-session prep; Slidev notes are a terse subset of this)
-│   │   ├── pre-read.md
+│   │   ├── pre-read.md            (S1 bespoke; S2+ are thin pointers to prior session's narrative.md + 1–3 optional external links)
 │   │   ├── study-prompt.md
-│   │   └── fact-check.md          (§10.2)
+│   │   ├── fact-check.md          (§10.2)
+│   │   └── narrative.md           (post-session companion; linked from slide 1; derived from speaker notes + enrichment — see narrative pipeline below)
 │   └── ...
 ├── demos/
 │   ├── tokenizer-explorer/        (standalone Vite app; own URL)

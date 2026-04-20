@@ -76,8 +76,8 @@ All six questions originally posed to Bryan have been resolved. Keeping the full
 - Q2 (S1 scope) → 45-min content / 60-min slot as the universal budget; S1 is 4 × 10-min interactives + 5-min territory closer with the architecture map moved from opening scaffolding to anticipation-engine. See outline §6 S1 decision log.
 - Q3 (Gemini verification) → three-layer defense: one-pass ledger (§10.1) + week-of revalidation (§10.2, 5th deliverable) + SOTA callout segment (§10.3). TPU/GPU/Apple Silicon arc consolidated into one ~10-min S5 block.
 - Q4 (depth target) → 3× confirmed as stated; no change.
-- Q5 (safety/alignment) → omitted from the public course entirely. Any safety coverage is off-the-cuff in the room or in a separately-crafted internal session outside this repo. See outline §11 safety-scope decision log.
-- Q6 (logistics) → (a) slides + narrative + recording link distributed post-session; slide 1 of the deck links to the narrative; (b) recorded, internal-only — allows moderate slide text density and more candid on-camera tone, with strict discipline that candid content stays out of public artifacts; (c) cadence is 4 weekly + 1-month gap + 6 weekly; study prompts are explicitly optional enrichment, not a corequisite, especially across the gap. See outline §2 delivery row, §3b cadence, §11 recording-and-narrative decision log.
+- Q5 (safety/alignment) → omitted from the public course entirely. Any safety coverage is off-the-cuff in the room or in a separately-crafted internal session outside this repo. See outline §2 safety/alignment row + §2 decision log at the end of the table.
+- Q6 (logistics) → (a) slides + narrative + recording link distributed post-session; slide 1 of the deck links to the narrative; (b) recorded, internal-only — allows moderate slide text density and more candid on-camera tone, with strict discipline that candid content stays out of public artifacts; (c) cadence is 4 weekly + 1-month gap + 6 weekly; study prompts are explicitly optional enrichment, not a corequisite, especially across the gap. See outline §2 (recording / pre-read / study-prompt rows + §2 decision log), §3b cadence, §11 narrative pipeline.
 
 ---
 
