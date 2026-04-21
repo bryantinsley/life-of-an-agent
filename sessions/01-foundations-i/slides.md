@@ -61,7 +61,7 @@ num: '0'
 
 # A warning and a promise.
 
-## Two pieces of housekeeping before the technical material starts.
+## Two pieces of housekeeping before we get to the technical material.
 
 <!--
 Two pieces of housekeeping before we get to the technical material. The first is a warning, and the second is a promise.
@@ -73,83 +73,30 @@ eyebrow: The warning
 title: This course is theory first. Agents come at the end.
 ---
 
-<div class="warning-lede">
+<div class="loa-lede">
 
-Most LLM courses start at the surface and try to work inward. **We're doing the opposite** — walking the trunk before the branches.
-
-</div>
-
-<div class="warning-grid">
-
-<div class="warning-card">
-  <div class="warning-card-kicker">What this means</div>
-  <div class="warning-card-body">The first three or four sessions are going to feel <em>slow</em>. You will know more than you can yet do anything with. That's normal — the same shape as any CS curriculum.</div>
-</div>
-
-<div class="warning-card">
-  <div class="warning-card-kicker">Why it works for SREs</div>
-  <div class="warning-card-body">You already think in layers. By S6, when we get to prefill vs. decode, the foundations pay off in ways they wouldn't if we'd skipped them.</div>
-</div>
-
-<div class="warning-card is-accent">
-  <div class="warning-card-kicker">The honest part</div>
-  <div class="warning-card-body">Some of you will get frustrated. <em>"When do we get to the interesting stuff?"</em> Call it out. I'll keep reminding you where we are on the trunk.</div>
-</div>
+Most LLM courses start at the surface and work inward. **We're doing the opposite** — walking the trunk before the branches.
 
 </div>
 
-<style>
-.warning-lede {
-  font-size: 20px;
-  line-height: 1.45;
-  color: var(--loa-ink-muted);
-  max-width: 68ch;
-  margin-bottom: 32px;
-  letter-spacing: -0.012em;
-}
-.warning-lede strong {
-  color: var(--loa-violet-700);
-  font-weight: 600;
-}
-.warning-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.warning-card {
-  background: #fff;
-  border: 1px solid var(--loa-rule);
-  border-radius: 10px;
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.warning-card.is-accent {
-  border-color: var(--loa-violet-200);
-  background: var(--loa-violet-050);
-}
-.warning-card-kicker {
-  font-family: var(--loa-font-sans);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--loa-cobalt-600);
-}
-.warning-card.is-accent .warning-card-kicker {
-  color: var(--loa-violet-700);
-}
-.warning-card-body {
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--loa-ink);
-}
-.warning-card-body em {
-  color: var(--loa-violet-800);
-  font-style: italic;
-}
-</style>
+<div class="loa-cards cols-3">
+
+<div class="loa-card">
+  <div class="loa-card-kicker">What this means</div>
+  <div class="loa-card-body">The first few sessions will feel <em>slow</em>. You'll know more than you can do anything with yet. That's normal — same shape as any CS curriculum.</div>
+</div>
+
+<div class="loa-card">
+  <div class="loa-card-kicker">Why it works for SREs</div>
+  <div class="loa-card-body">You already think in layers. By S6, when we get to prefill vs. decode, the foundations pay off in ways they wouldn't if we'd skipped them.</div>
+</div>
+
+<div class="loa-card is-accent">
+  <div class="loa-card-kicker">The honest part</div>
+  <div class="loa-card-body">Some of you will get frustrated. <em>"When do we get to the interesting stuff?"</em> Call it out. I'll keep reminding you where we are on the trunk.</div>
+</div>
+
+</div>
 
 <!--
 A normal LLM course right now starts with prompting techniques and works inward, occasionally name-dropping attention or embeddings without ever explaining what they are. That style is fine for end-users. It is not fine for SREs who are going to be on call for systems that have these things inside them. So we are doing the opposite. We are going to build the transformer from the bottom up — tokens, embeddings, attention, the rest of the block, training, serving — and only then put the agent harness on top.
@@ -162,115 +109,33 @@ The reason this works for SREs in particular is that you already think in layers
 ---
 layout: default
 eyebrow: The promise
-title: By session 10, you'll walk a single agent turn through every layer.
+title: By S10, you'll walk a single agent turn through every layer.
 ---
 
-<div class="promise-lede">
+<div class="loa-lede">
 
 Every word in the sequence below will mean something specific and mechanical — not a metaphor, not a hand-wave.
 
 </div>
 
-<div class="promise-chain">
-  <div class="promise-step"><span class="promise-num">01</span><span class="promise-label">token in</span></div>
-  <div class="promise-step"><span class="promise-num">02</span><span class="promise-label">embedding lookup</span></div>
-  <div class="promise-step"><span class="promise-num">03</span><span class="promise-label">attention</span></div>
-  <div class="promise-step"><span class="promise-num">04</span><span class="promise-label">residual stream</span></div>
-  <div class="promise-step"><span class="promise-num">05</span><span class="promise-label">logits</span></div>
-  <div class="promise-step"><span class="promise-num">06</span><span class="promise-label">sampling</span></div>
-  <div class="promise-step"><span class="promise-num">07</span><span class="promise-label">tool call</span></div>
-  <div class="promise-step"><span class="promise-num">08</span><span class="promise-label">harness dispatch</span></div>
-  <div class="promise-step"><span class="promise-num">09</span><span class="promise-label">result</span></div>
-  <div class="promise-step is-accent"><span class="promise-num">10</span><span class="promise-label">next token</span></div>
+<div class="loa-chain cols-5">
+  <div class="loa-chain-step"><span class="loa-chain-num">01</span><span class="loa-chain-label">token in</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">02</span><span class="loa-chain-label">embedding lookup</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">03</span><span class="loa-chain-label">attention</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">04</span><span class="loa-chain-label">residual stream</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">05</span><span class="loa-chain-label">logits</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">06</span><span class="loa-chain-label">sampling</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">07</span><span class="loa-chain-label">tool call</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">08</span><span class="loa-chain-label">harness dispatch</span></div>
+  <div class="loa-chain-step"><span class="loa-chain-num">09</span><span class="loa-chain-label">result</span></div>
+  <div class="loa-chain-step is-accent"><span class="loa-chain-num">10</span><span class="loa-chain-label">next token</span></div>
 </div>
 
-<div class="promise-closer">
+<div class="loa-closer">
 
-Nothing in there is magic. It's layers of math with engineering choices on top, and the engineering choices are where your latency, cost, and reliability intuitions come from.
+Nothing in there is magic. It's layers of math with engineering choices on top — and the engineering choices are where your latency, cost, and reliability intuitions come from.
 
 </div>
-
-<style>
-.promise-lede {
-  font-size: 18px;
-  line-height: 1.45;
-  color: var(--loa-ink-muted);
-  max-width: 64ch;
-  margin-bottom: 24px;
-  letter-spacing: -0.012em;
-}
-.promise-chain {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 24px;
-}
-.promise-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: #fff;
-  border: 1px solid var(--loa-rule);
-  border-radius: 8px;
-}
-.promise-step.is-accent {
-  background: var(--loa-gradient-brand);
-  border-color: transparent;
-  color: #fff;
-}
-.promise-num {
-  font-family: var(--loa-font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--loa-cobalt-600);
-}
-.promise-step.is-accent .promise-num {
-  color: rgba(255, 255, 255, 0.7);
-}
-.promise-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--loa-ink);
-}
-.promise-step.is-accent .promise-label {
-  color: #fff;
-}
-.promise-closer {
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--loa-ink-muted);
-  max-width: 68ch;
-  padding-top: 16px;
-  border-top: 1px solid var(--loa-rule);
-}
-</style>
-
----
-layout: demo
-url: http://localhost:5176
----
-
-<!--
-This is demo 3 — the embedding scatter. Hover any word to see its 2D neighbors; click an analogy button to run vector arithmetic on the high-dimensional vectors. Notice that clustering is category-aware even though nobody labeled the categories during training.
--->
-
----
-layout: section
-eyebrow: End of reference
-num: 'A'
----
-
-# That's the new visual system.
-
-## The rest of the deck still uses the old theme — review slides 1–5, then we'll roll out.
-
-<!--
-End of the polished reference block. Slides beyond this still use the old bare-bones treatment until we align on direction.
--->
-
 
 <!--
 That sequence is the capstone — session ten. We will literally take one agent turn and walk it down through every layer we have covered. By that point, every word in that sentence — embedding, attention, residual stream, logits, sampling, tool call, harness — is going to mean a specific, mechanical thing that you can point at and explain.
@@ -279,28 +144,38 @@ The thing I want you to leave tonight believing is that this is *learnable*. The
 -->
 
 ---
-layout: two-cols-header
+layout: default
+eyebrow: Mental models
+title: Four ideas we'll keep coming back to.
 ---
 
-## The four mental models we'll keep coming back to
+<div class="loa-lede">
 
-::left::
-
-<div class="pt-4 space-y-4">
-
-**1. The residual stream.** A shared workspace of vectors that every layer reads from and writes to. We meet it tonight.
-
-**2. "It's all just tokens."** Text, tool calls, tool results, system prompts — the model sees them as the same substrate. Unlocks most of the agent material.
+These four recur in every session. I'm naming them up front so when they come back, you recognize them.
 
 </div>
 
-::right::
+<div class="loa-cards cols-2">
 
-<div class="pt-4 space-y-4">
+<div class="loa-card">
+  <div class="loa-card-kicker">01 · The residual stream</div>
+  <div class="loa-card-body">A shared workspace of vectors that every layer reads from and writes to. We meet it tonight.</div>
+</div>
 
-**3. Training vs. inference.** Two completely different regimes. Different infrastructure, different cost structures, different failure modes. Half the confusions in any LLM conversation trace back to conflating them.
+<div class="loa-card">
+  <div class="loa-card-kicker">02 · It's all just tokens</div>
+  <div class="loa-card-body">Text, tool calls, tool results, system prompts — the model sees them as the same substrate. Unlocks most of the agent material.</div>
+</div>
 
-**4. Prefill vs. decode.** The two phases of one inference request. Different bottlenecks, different optimizations. The SRE story lives here.
+<div class="loa-card">
+  <div class="loa-card-kicker">03 · Training vs. inference</div>
+  <div class="loa-card-body">Two completely different regimes. Different infrastructure, different cost structures, different failure modes. Half the confusions trace back to conflating them.</div>
+</div>
+
+<div class="loa-card is-accent">
+  <div class="loa-card-kicker">04 · Prefill vs. decode</div>
+  <div class="loa-card-body">Two phases of one inference request. Different bottlenecks, different optimizations. The SRE story lives here.</div>
+</div>
 
 </div>
 
@@ -320,36 +195,22 @@ Four ideas. They will get repeated. That is on purpose.
 
 ---
 layout: section
+eyebrow: Part 1 · ~10 min
+num: '1'
 ---
 
-# Part 1 — What an agent actually is
+# What an agent actually is.
 
-<div class="text-sm opacity-60 pt-4">~10 minutes</div>
+## One full agent turn, surface-level. You'll see every layer named but not yet explained.
 
 <!--
 We are going to start by looking at the thing we are going to spend ten weeks taking apart. I am going to show you one full agent turn — a user types a message, the model thinks, decides to call a tool, the harness dispatches the tool, the result comes back, the model continues. You will see every layer at the surface, named but not yet explained. That is on purpose. By session ten you will be able to point at any of these arrows and say what is actually happening underneath.
 -->
 
 ---
-
-## One agent turn, end to end
-
-<div class="pt-2 text-sm opacity-70">
-Click through. Don't worry about the words you don't recognize yet. We're naming the layers, not explaining them.
-</div>
-
-<div class="pt-4 -mx-12 px-12">
-  <iframe
-    src="http://localhost:5174/"
-    class="w-full"
-    style="height: 460px; border: 1px solid var(--slidev-theme-primary); border-radius: 8px;"
-  />
-</div>
-
-<div class="text-xs opacity-60 pt-2 flex justify-between">
-  <span>Demo: <code>/demos/agent-loop/</code></span>
-  <a href="http://localhost:5174/" target="_blank" class="hover:underline">↗ open standalone</a>
-</div>
+layout: demo
+url: http://localhost:5174/
+---
 
 <!--
 What I want you to look at here is not the words flowing past — it is the *structure*. Notice that there is a loop. The user sends a message. The model emits a response that contains, embedded in its text, what looks like a function call. Some piece of code outside the model — we call that the harness — recognizes that pattern, peels it out, runs the actual function, and pastes the result back into the conversation as if it were another message. The model then sees that result and decides what to do next. Maybe call another tool. Maybe answer the user. Maybe think out loud some more.
@@ -359,43 +220,47 @@ This loop — model emits, harness dispatches, result returns, model continues �
 Walk through the demo at your own pace. Notice the layers we will be unpacking: the tokens going in, the model deciding what to emit, the structured tool call hidden inside ordinary-looking text, the dispatch, the response coming back, the next forward pass.
 
 Every layer in this picture corresponds to at least one session of this course. Tonight we are going to start at the very bottom — the part where the user's text becomes numbers the model can do math on.
+
+Speaker caption on the slide: this is the agent-loop demo. Click through. Don't worry about words you don't recognize yet — we're naming layers, not explaining them. Demo URL: /demos/agent-loop/.
 -->
 
 ---
+layout: default
+eyebrow: What you just saw
+title: Every layer in that loop is a session.
+---
 
-## What you just saw — every layer is a session
+<div class="loa-schedule">
 
-<div class="grid grid-cols-2 gap-x-8 gap-y-3 pt-4 text-sm">
+<div class="loa-schedule-item">Tokens · embeddings · the residual stream</div>
+<div class="loa-schedule-session is-now">tonight · S1</div>
 
-<div><b>Tokens / embeddings</b></div>
-<div class="opacity-70">→ tonight (S1)</div>
+<div class="loa-schedule-item">Attention — how positions exchange information</div>
+<div class="loa-schedule-session">S2</div>
 
-<div><b>Attention — how positions exchange information</b></div>
-<div class="opacity-70">→ S2</div>
+<div class="loa-schedule-item">The full forward pass — block stacking, logits</div>
+<div class="loa-schedule-session">S3</div>
 
-<div><b>The full forward pass — block stacking, logits</b></div>
-<div class="opacity-70">→ S3</div>
+<div class="loa-schedule-item">Where the parameters came from — training</div>
+<div class="loa-schedule-session">S4</div>
 
-<div><b>Where the parameters came from — training</b></div>
-<div class="opacity-70">→ S4</div>
+<div class="loa-schedule-item">Prefill vs. decode — the two phases of inference</div>
+<div class="loa-schedule-session">S5</div>
 
-<div><b>Prefill vs. decode — the two phases of inference</b></div>
-<div class="opacity-70">→ S5</div>
+<div class="loa-schedule-item">Sampling, batching, serving at scale</div>
+<div class="loa-schedule-session">S6</div>
 
-<div><b>Sampling and serving at scale</b></div>
-<div class="opacity-70">→ S6</div>
+<div class="loa-schedule-item">The agent loop, tools, system prompts</div>
+<div class="loa-schedule-session">S7</div>
 
-<div><b>The agent loop, tools, system prompts</b></div>
-<div class="opacity-70">→ S7</div>
+<div class="loa-schedule-item">Context engineering and long-horizon work</div>
+<div class="loa-schedule-session">S8</div>
 
-<div><b>Context engineering and long-horizon work</b></div>
-<div class="opacity-70">→ S8</div>
+<div class="loa-schedule-item">Reliability, failure modes, evals</div>
+<div class="loa-schedule-session">S9</div>
 
-<div><b>Reliability, failure modes, evals</b></div>
-<div class="opacity-70">→ S9</div>
-
-<div><b>End-to-end synthesis</b></div>
-<div class="opacity-70">→ S10</div>
+<div class="loa-schedule-item"><em>End-to-end synthesis — one agent turn through every layer</em></div>
+<div class="loa-schedule-session">S10</div>
 
 </div>
 
@@ -415,11 +280,13 @@ OK. That is the promise. Let us start paying it off.
 
 ---
 layout: section
+eyebrow: Part 2 · ~10 min
+num: '2'
 ---
 
-# Part 2 — Tokens
+# Tokens.
 
-<div class="text-sm opacity-60 pt-4">~10 minutes</div>
+## The model never sees text. Before anything else happens, your string becomes a list of integers.
 
 <!--
 The first thing we have to confront is that the model does not see text. It cannot. A neural network is a collection of matrix multiplications and nonlinearities operating on vectors of floating-point numbers. There is no opcode in there for "the letter A." So before any model does anything, the text has to become numbers.
@@ -430,16 +297,18 @@ Those integers are tokens. And tokens are not what you think they are.
 -->
 
 ---
+layout: default
+eyebrow: Step 1
+title: The model never sees text. It sees integers.
+---
 
-## The model never sees text. It sees integers.
-
-<div class="pt-6">
+<div class="loa-pipeline">
 
 ```text
 "The quick brown fox"
 ```
 
-<div class="text-2xl opacity-50 text-center py-2">↓  tokenizer</div>
+<div class="loa-pipeline-arrow">tokenizer</div>
 
 ```text
 [464, 2068, 7586, 21831]
@@ -447,8 +316,10 @@ Those integers are tokens. And tokens are not what you think they are.
 
 </div>
 
-<div class="text-sm opacity-70 pt-8">
-Every model has its own tokenizer. Every API call starts here, before any matrix multiply happens.
+<div class="loa-closer">
+
+Every model ships its own tokenizer. Every API call starts here — before any matrix multiply happens, your string is already a list of integer IDs drawn from a fixed vocabulary (50K–300K entries).
+
 </div>
 
 <!--
@@ -458,35 +329,29 @@ The naive question to ask now is: how does it chop it up? And the naive answer �
 -->
 
 ---
+layout: default
+eyebrow: Design tradeoff
+title: Why not characters? Why not words?
+---
 
-## Why not characters? Why not words?
+<div class="loa-cards cols-2">
 
-<div class="grid grid-cols-2 gap-12 pt-4">
-
-<div>
-
-**Characters** would be the cleanest mental model.
-
-26 letters plus punctuation. Tiny vocabulary. No surprises.
-
-But: every word becomes a long sequence. The model would burn most of its computation on letter-by-letter combinatorics before it could think about meaning.
-
+<div class="loa-card">
+  <div class="loa-card-kicker">Characters · too granular</div>
+  <div class="loa-card-body">Tiny vocab. No surprises. But every word becomes a long sequence, and the model burns its early layers on letter-by-letter combinatorics before it can think about meaning.</div>
 </div>
 
-<div>
-
-**Words** would be the second-cleanest.
-
-But: vocabulary is unbounded. New words appear constantly. Misspellings, hashtags, code, URLs, emoji.
-
-And every language has different words, so a multilingual model needs an unboundedly-large vocabulary, which means a huge embedding table, which means a huge model.
-
+<div class="loa-card">
+  <div class="loa-card-kicker">Words · unbounded</div>
+  <div class="loa-card-body">New words appear constantly. Misspellings, hashtags, code, URLs, emoji. Multilingual means an unboundedly-large vocabulary, which means a huge embedding table, which means a huge model.</div>
 </div>
 
 </div>
 
-<div class="pt-8 text-center text-lg">
-<b>The compromise</b>: <i>sub-word</i> tokens. Common pieces of text get their own token; rare pieces get split into smaller pieces.
+<div class="loa-callout is-violet" style="margin-top: 28px;">
+
+<b>The compromise — sub-word tokens.</b> Common pieces of text get their own token; rare pieces get split into smaller ones. The dominant algorithm is <em>Byte-Pair Encoding (BPE)</em>: start with characters, merge the most common adjacent pair, repeat until you hit target vocab size. That's the whole trick.
+
 </div>
 
 <!--
@@ -502,25 +367,9 @@ The result is that English text — which dominates training data — tokenizes 
 -->
 
 ---
-
-## Let's look at it
-
-<div class="text-sm opacity-70 pb-2">
-Paste your name. Paste an emoji. Paste some code. Paste a sentence in a non-English language. Watch what happens.
-</div>
-
-<div class="-mx-12 px-12">
-  <iframe
-    src="http://localhost:5175/"
-    class="w-full"
-    style="height: 460px; border: 1px solid var(--slidev-theme-primary); border-radius: 8px;"
-  />
-</div>
-
-<div class="text-xs opacity-60 pt-2 flex justify-between">
-  <span>Demo: <code>/demos/tokenizer-explorer/</code> — real BPE, runs entirely in your browser</span>
-  <a href="http://localhost:5175/" target="_blank" class="hover:underline">↗ open standalone</a>
-</div>
+layout: demo
+url: http://localhost:5175/
+---
 
 <!--
 This is a real tokenizer running entirely in your browser — no server call, no API. You can paste anything in and watch how it gets chopped up. I want you to try a few things.
@@ -534,25 +383,29 @@ Third, paste some code. A few things to notice. White-space is significant — `
 Fourth, paste a sentence in Mandarin or Hindi or Arabic. You will often see the token count balloon. The same semantic content can take three to five times as many tokens in a non-English language, and you pay for every one of them.
 
 Watch the token count. That is the number you are billed on. That is the number that consumes your context window. That is the number that drives your latency. Everything that happens later in the pipeline is paid for in tokens.
+
+Speaker caption on the slide: paste your name. Paste an emoji. Paste some code. Paste a sentence in a non-English language. Watch what happens. Demo URL: /demos/tokenizer-explorer/.
 -->
 
 ---
+layout: default
+eyebrow: What you felt
+title: Tokens are not words.
+---
 
-## What you should have noticed
+<div class="loa-observations">
 
-<v-clicks>
+<div data-n="01"><div><strong>Tokens are not words.</strong> <code>"unbelievable"</code> is often three tokens. <code>" the"</code> (leading space) is a different token from <code>"the"</code>.</div></div>
 
-**Tokens are not words.** `"unbelievable"` is often three tokens. `" the"` (with a leading space) is a different token from `"the"` without one.
+<div data-n="02"><div><strong>Capitalization matters.</strong> <code>"Hello"</code> and <code>"hello"</code> may not share a token.</div></div>
 
-**Capitalization matters.** `"Hello"` and `"hello"` may not share a token.
+<div data-n="03"><div><strong>Non-English text costs more.</strong> Same meaning, 3–5× the tokens.</div></div>
 
-**Non-English text costs more.** Same meaning, more tokens. Often 3–5×.
+<div data-n="04"><div><strong>Code tokenizes weirdly.</strong> Whitespace, indentation, and unusual identifiers all matter.</div></div>
 
-**Code tokenizes weirdly.** Whitespace, indentation, and unusual identifiers all matter.
+<div data-n="05"><div><strong>Emoji are expensive.</strong> A single emoji can be three or four tokens.</div></div>
 
-**Emoji are expensive.** A single emoji can be three or four tokens.
-
-</v-clicks>
+</div>
 
 <!--
 Let me name the things you should have just felt.
@@ -573,24 +426,24 @@ These are not edge cases. These are the things that quietly determine your cost 
 -->
 
 ---
+layout: default
+eyebrow: SRE callout
+title: Tokenization is a billing failure mode.
+---
 
-## SRE callout — tokenization is a billing failure mode
+<div class="loa-callout">
 
-<div class="pt-6 space-y-4">
+<b>You are billed per token. You don't control the tokenizer.</b> Byte counts are not token counts — token counts are <em>empirical</em>.
 
-<div class="border-l-4 pl-4" style="border-color: var(--slidev-theme-primary);">
-You are billed per token. You don't control the tokenizer.
 </div>
 
-<v-clicks>
+<div class="loa-observations" style="margin-top: 24px;">
 
-A log pipeline that feeds an LLM can **10× its cost overnight** if the log format changes — say, switching to a structured format with more punctuation, or adding non-ASCII trace IDs.
+<div data-n="→"><div>A log pipeline that feeds an LLM can <strong>10× its cost overnight</strong> if the log format changes — a structured JSON wrapper, a new trace-ID format, an emoji severity flag. Your bytes barely move; your tokens double.</div></div>
 
-A multilingual rollout doesn't just multiply traffic; it multiplies tokens-per-request.
+<div data-n="→"><div>A multilingual rollout doesn't just multiply traffic; it multiplies <strong>tokens-per-request</strong>.</div></div>
 
-Token counts are non-trivially difficult to predict from byte counts. They are *empirical*.
-
-</v-clicks>
+<div data-n="→"><div>Byte-level monitoring won't catch it. Monitor the <strong>token side</strong> directly.</div></div>
 
 </div>
 
@@ -607,20 +460,30 @@ There is more to say about tokenization — weight tying, why tokenizer-free mod
 -->
 
 ---
+layout: default
+eyebrow: Gemini callout
+title: What's public.
+---
 
-## Gemini callout — what's public
+<div class="loa-cards cols-2">
 
-<div class="pt-6 space-y-3 text-sm">
+<div class="loa-card is-cobalt">
+  <div class="loa-card-kicker">Tokenizer</div>
+  <div class="loa-card-body">Gemini uses <strong>SentencePiece</strong>. Google's own open-source sub-word library; supports BPE among other algorithms.</div>
+</div>
 
-Gemini uses a **SentencePiece** tokenizer.
-
-The current public vocabulary is **~256K pieces**, shared with the open **Gemma** family.
-
-Google has published enough for Gemma users to reproduce tokenization exactly. The training corpus and the rest of the production pipeline are not public.
+<div class="loa-card is-cobalt">
+  <div class="loa-card-kicker">Vocabulary</div>
+  <div class="loa-card-body">Public Gemini vocab is <strong>~256K pieces</strong>, shared with the open <strong>Gemma</strong> family. Anyone can reproduce tokenization byte-for-byte.</div>
+</div>
 
 </div>
 
-<div class="text-xs opacity-50 pt-8">Sources: <code>fact-check.md</code> rows 1 &amp; the §10.1 ledger.</div>
+<div class="loa-closer">
+
+<strong>What's not public:</strong> training corpus details, the exact tokenizer-training procedure, and serving-side optimizations. Sources: <code>fact-check.md</code> row 1 + the §10.1 ledger.
+
+</div>
 
 <!--
 The Gemini-specific tokenizer detail. Not worth dwelling on — the principles are the same — but worth naming because some of you will want to know.
@@ -634,11 +497,13 @@ If anyone asks how it compares to GPT-style tiktoken vocabularies — those are 
 
 ---
 layout: section
+eyebrow: Part 3 · ~10 min
+num: '3'
 ---
 
-# Part 3 — Embeddings
+# Embeddings.
 
-<div class="text-sm opacity-60 pt-4">~10 minutes</div>
+## Integer IDs are arbitrary. The first layer converts each one into a vector that actually carries meaning.
 
 <!--
 The text has become integers. But integers, by themselves, are useless to a neural network. The integer 7 is not bigger than the integer 5 in any meaningful sense — they are arbitrary IDs. If the tokenizer happened to assign "cat" to ID 47291 and "dog" to ID 88203, the model has no information about whether those concepts are related, just from the IDs.
@@ -647,10 +512,12 @@ So the very first thing the model does — the very first layer, before any of t
 -->
 
 ---
+layout: default
+eyebrow: Step 2
+title: The first layer is a lookup table.
+---
 
-## The first layer is a lookup table
-
-<div class="grid grid-cols-2 gap-12 pt-6">
+<div class="loa-split">
 
 <div>
 
@@ -658,19 +525,20 @@ So the very first thing the model does — the very first layer, before any of t
 token id 464  ("The")
         ↓
 [ 0.13, -0.42,  0.91, ..., 0.07 ]
-        (a 4096-dim vector for a small model;
-         12,288 dims for GPT-3)
+
+       (4,096 dims for a small model;
+        12,288 dims for GPT-3)
 ```
 
 </div>
 
 <div>
 
-The model has one row in the table per token in the vocabulary.
+**One row in the table per token in the vocabulary.**
 
-50K–300K tokens × thousands of dimensions = the *embedding table*.
+50K–300K tokens × thousands of dimensions = the *embedding table*. That's parameters — learned during training, like everything else.
 
-It's parameters. It was learned during training, like all parameters. From now on, the model never refers to integer IDs again — only to vectors.
+From this layer onward, **the model never refers to integer IDs again.** It only knows vectors. The IDs were a temporary bridge between human-readable text and the floating-point world the network computes in.
 
 </div>
 
@@ -687,25 +555,9 @@ The crucial conceptual move is that, from this layer onward, the model never ref
 -->
 
 ---
-
-## The vectors carry meaning
-
-<div class="text-sm opacity-70 pb-2">
-The training process arranges the table so that tokens with similar meanings end up with similar vectors. Watch.
-</div>
-
-<div class="-mx-12 px-12">
-  <iframe
-    src="http://localhost:5176/"
-    class="w-full"
-    style="height: 460px; border: 1px solid var(--slidev-theme-primary); border-radius: 8px;"
-  />
-</div>
-
-<div class="text-xs opacity-60 pt-2 flex justify-between">
-  <span>Demo: <code>/demos/embedding-scatter/</code> — real word embeddings, projected to 2D</span>
-  <a href="http://localhost:5176/" target="_blank" class="hover:underline">↗ open standalone</a>
-</div>
+layout: demo
+url: http://localhost:5176/
+---
 
 <!--
 This is a 2D projection of real word embeddings. The actual vectors are hundreds of dimensions; we have squashed them down to two using a standard projection technique called PCA so we can plot them on a screen. A lot of structure gets lost in the squashing, but enough survives to make the point.
@@ -717,32 +569,34 @@ There is a famous demo I am going to call out. Take the vector for "king", subtr
 Now, the modern caveat. This king-minus-man-plus-woman effect was much cleaner in the older word-embedding models — word2vec, GloVe — that were trained specifically for these properties. In the embedding tables of modern transformer LLMs, where the table is just an input layer and gets shaped by all sorts of training pressures, the analogy property is fuzzier. It still works for many cases. It does not work for all of them. Do not over-interpret the metaphor as "the model has a clean conceptual map of the world." It has a useful, lumpy, complicated representation.
 
 Take a minute to play with the demo. Hover over points. See what is near what. Try the analogy buttons. The takeaway is the *visibility* of structure — these are not random vectors.
+
+Speaker caption on the slide: 2D projection of real word embeddings. The training process arranges the table so tokens with similar meanings end up with similar vectors. Hover to explore; try the analogy buttons. Demo URL: /demos/embedding-scatter/.
 -->
 
 ---
+layout: default
+eyebrow: Frame it carefully
+title: What this is, and what this isn't.
+---
 
-## What this is, and what this isn't
+<div class="loa-cards cols-2">
 
-<div class="grid grid-cols-2 gap-8 pt-6 text-sm">
-
-<div>
-
-**It is**
-
-- A high-dimensional space where geometric distance corresponds, roughly, to semantic similarity
-- A representation learned because it makes next-token prediction easier
-- The substrate that everything downstream operates on
-
+<div class="loa-card">
+  <div class="loa-card-kicker">It is</div>
+  <div class="loa-card-body">
+    <p>A high-dimensional space where geometric distance corresponds — roughly — to semantic similarity.</p>
+    <p>Learned because it makes next-token prediction easier.</p>
+    <p>The <strong>substrate</strong> that everything downstream operates on.</p>
+  </div>
 </div>
 
-<div>
-
-**It isn't**
-
-- A clean conceptual map ("the model has a model of the world")
-- Static — the input table doesn't change inference-to-inference, but the vector at each *position* will change as it flows through layers (next: the residual stream)
-- Universal — every model has its own embedding space; you cannot transplant vectors across models
-
+<div class="loa-card is-accent">
+  <div class="loa-card-kicker">It isn't</div>
+  <div class="loa-card-body">
+    <p>A clean conceptual map — <em>"the model has a model of the world."</em> It doesn't.</p>
+    <p>Static through the forward pass — the table is fixed, but the vector at each <em>position</em> changes as it flows through layers.</p>
+    <p>Universal. Every model has its own embedding space. You can't transplant vectors across models.</p>
+  </div>
 </div>
 
 </div>
@@ -761,58 +615,63 @@ That evolution — the vector at each position changing as it goes down the laye
 
 ---
 layout: section
+eyebrow: Part 4 · ~10 min
+num: '4'
 ---
 
-# Part 4 — The residual stream
+# The residual stream.
 
-<div class="text-sm opacity-60 pt-4">~10 minutes</div>
+## The single most useful mental model for what's happening inside a transformer.
 
 <!--
 The residual stream is the single most useful mental model I can give you for what the inside of a transformer looks like. Once you have it, every other piece of the architecture — attention, feed-forward layers, layer norms, the output head — slots into a clean picture. Without it, the architecture diagrams that show up in every transformer paper look like spaghetti.
 -->
 
 ---
+layout: default
+eyebrow: Step 3
+title: A shared workspace, running top to bottom.
+---
 
-## The residual stream — picture it
-
-<div class="grid grid-cols-2 gap-8 pt-4">
+<div class="loa-split">
 
 <div>
 
 ```text
 position:  [pos 0] [pos 1] [pos 2] ...
             ┃       ┃       ┃
-embedding   ●       ●       ●     ← each position
-table  →    │       │       │       gets its starting
-            ▼       ▼       ▼       vector
+embedding   ●       ●       ●
+table  →    │       │       │
+            ▼       ▼       ▼
         ┌───────────────────────┐
-        │      block 1          │   ← reads the stream,
-        │  attention + FFN      │     adds to it
+        │      block 1          │   reads stream,
+        │  attention + FFN      │   adds to it
         └───────────────────────┘
             │       │       │
             ▼       ▼       ▼
         ┌───────────────────────┐
-        │      block 2          │   ← same thing
+        │      block 2          │   same thing
         └───────────────────────┘
             ...
             ▼       ▼       ▼
-            ●       ●       ●     ← final state, used
-                                    to predict next token
+            ●       ●       ●     final state →
+                                  predicts next token
 ```
 
 </div>
 
-<div class="text-sm">
+<div>
 
-Every position in the sequence has a vector. That vector flows down through the model.
+**Every position has a vector. The vector flows down through the model.**
 
-Every block (50–100+ of them in a real model) does two things:
-1. **Reads** the current state of the stream
-2. **Adds** something to it
+Every block (50–120+ of them in a real model) does two things:
 
-The vector at each position is *cumulative* — it carries everything every layer has put into it.
+1. **Reads** the current state of the stream.
+2. **Adds** a delta back into it.
 
-This is why it's called a *residual stream*: each layer's output is added to the residual, not replacing it.
+It doesn't overwrite. It doesn't replace. It *adds*. The vector at any position is <em>cumulative</em> — it carries everything every layer has put into it.
+
+That additive structure is why we call it the residual <em>stream</em>.
 
 </div>
 
@@ -835,25 +694,9 @@ The demo lets you pick a position and watch its vector evolve as it flows down. 
 -->
 
 ---
-
-## Watch one position evolve
-
-<div class="text-sm opacity-70 pb-2">
-Pick a token. Step through the layers. Notice how each block adds — never overwrites.
-</div>
-
-<div class="-mx-12 px-12">
-  <iframe
-    src="http://localhost:5177/"
-    class="w-full"
-    style="height: 460px; border: 1px solid var(--slidev-theme-primary); border-radius: 8px;"
-  />
-</div>
-
-<div class="text-xs opacity-60 pt-2 flex justify-between">
-  <span>Demo: <code>/demos/residual-stream-animator/</code> — real activations from GPT-2 small</span>
-  <a href="http://localhost:5177/" target="_blank" class="hover:underline">↗ open standalone</a>
-</div>
+layout: demo
+url: http://localhost:5177/
+---
 
 <!--
 What you are looking at here is real. These are actual intermediate activations from a real, small transformer — GPT-2 small, twelve layers — that we ran ahead of time and recorded so we could play them back in your browser. We picked a token, watched the residual-stream vector at that position evolve as it flowed down through all twelve transformer blocks, and the demo is rendering that evolution.
@@ -863,39 +706,27 @@ The colored bars are the *delta* each layer added — the contribution that bloc
 We are not going to defend that interpretation in detail tonight. The takeaway is the *shape*: a vector starts as the embedding for the input token, gets nudged by every block, and ends as the input to the output head. The mechanism by which each block decides what to nudge is what next week is for. Tonight is just "feel that the workspace is real."
 
 This is also a useful place to plant a flag for what is coming. Right now the demo shows the vector at one position. But every block is also pulling information from *other positions* — the attention operation. We have not shown that yet. Next week we will pull back the curtain on it and you will see how each block decides which other positions to read from before it decides what to add.
+
+Speaker caption on the slide: real activations from GPT-2 small. Pick a token. Step through the layers. Every block adds — never overwrites. Demo URL: /demos/residual-stream-animator/.
 -->
 
 ---
+layout: default
+eyebrow: The cliffhanger
+title: Each block adds *something* to the stream. What?
+---
 
-## What's next time
+<div class="loa-cards cols-2">
 
-<div class="pt-8 space-y-6">
-
-<div>
-
-**The question we just opened**: each block adds *something* to the stream. What does it decide to add, and based on what?
-
+<div class="loa-card">
+  <div class="loa-card-kicker">Half the answer · next week</div>
+  <div class="loa-card-body">Each block reads from <strong>other positions</strong> in the stream. That's the <strong>attention</strong> mechanism — the single most important operation in a transformer. All of S2.</div>
 </div>
 
-<v-click>
-
-<div>
-
-**Half the answer**: it reads from the *other* positions in the stream. That's the attention mechanism — next week.
-
+<div class="loa-card is-accent">
+  <div class="loa-card-kicker">Other half · S3</div>
+  <div class="loa-card-body">Each block also has a <strong>per-position "thinking"</strong> component — the feed-forward network. Plus layer norms, the rest of the block wiring, and how the final stream becomes a prediction.</div>
 </div>
-
-</v-click>
-
-<v-click>
-
-<div>
-
-**The other half**: each block also has a position-local "thinking" component called the feed-forward network. Session 3.
-
-</div>
-
-</v-click>
 
 </div>
 
@@ -909,75 +740,89 @@ If you remember one thing from tonight, remember the residual stream. Every othe
 
 ---
 layout: section
+eyebrow: Closer · ~5 min
+num: 'A'
 ---
 
-# The territory
+# The territory.
 
-<div class="text-sm opacity-60 pt-4">~5 minutes — and we close</div>
+## A wide shot of the whole architecture — you can now read more of the labels than you could an hour ago.
 
 <!--
 We are going to close on a wide shot. I am going to put up the architecture map that we are going to come back to over and over for the next nine weeks, and we are going to read it together — not because you can fill in every box, but because you can now read more of the labels than you could an hour ago.
 -->
 
 ---
+layout: default
+eyebrow: The map
+title: What you can read now vs. what's coming.
+---
 
-## The map
+<div class="loa-split">
 
-<div class="pt-2 text-sm opacity-70">
-The diagram every transformer paper draws. We just covered the bottom three rows. The rest is what the next nine weeks are for.
-</div>
+<div class="loa-map">
 
-<div class="grid grid-cols-2 gap-8 pt-4 text-xs">
-
-<div class="space-y-1 font-mono">
-<div>┌───────────────────────────────┐</div>
-<div>│      output token             │  ← S3, S6, S7</div>
-<div>│           ▲                   │</div>
-<div>│      sampling                 │  ← <span class="text-orange">S6, S7</span></div>
-<div>│           ▲                   │</div>
-<div>│      logits                   │  ← <span class="text-orange">S3</span></div>
-<div>│           ▲                   │</div>
-<div>│      unembedding              │  ← <span class="text-orange">S3</span></div>
-<div>│           ▲                   │</div>
-<div>│   ┌─────────────────────┐     │</div>
-<div>│   │ block 50–120        │     │</div>
-<div>│   │  attention + FFN    │     │  ← <span class="text-orange">S2, S3</span></div>
-<div>│   │   + residual + LN   │     │</div>
-<div>│   └─────────────────────┘     │</div>
-<div>│           ▲                   │</div>
-<div>│         ...                   │</div>
-<div>│           ▲                   │</div>
-<div>│   ┌─────────────────────┐     │</div>
-<div>│   │ block 1             │     │</div>
-<div>│   └─────────────────────┘     │</div>
-<div>│           ▲                   │</div>
-<div>│   ●  ●  ●  ●  ●               │  ← <b style="color: var(--slidev-theme-primary)">tonight: residual stream</b></div>
-<div>│           ▲                   │</div>
-<div>│   embedding lookup            │  ← <b style="color: var(--slidev-theme-primary)">tonight</b></div>
-<div>│           ▲                   │</div>
-<div>│   tokens (integer IDs)        │  ← <b style="color: var(--slidev-theme-primary)">tonight</b></div>
-<div>│           ▲                   │</div>
-<div>│   tokenizer                   │  ← <b style="color: var(--slidev-theme-primary)">tonight</b></div>
-<div>│           ▲                   │</div>
-<div>│   user message                │</div>
-<div>└───────────────────────────────┘</div>
-</div>
-
-<div class="space-y-3">
-
-**Bottom of the stack** — covered tonight.
-
-**Middle** — what each block actually computes (S2 attention, S3 FFN + the rest of the block).
-
-**Top** — how a vector becomes a token (S3) and what the sampling knobs do (S6).
-
-**Outside the picture** — where the parameters came from (S4: training), how the request runs in production (S5: prefill/decode), how the harness wraps the model (S7–S9: agents).
-
-**S10** is one full agent turn through the whole stack.
+```text
+┌───────────────────────────────┐
+│      output token             │
+│           ▲                   │
+│      sampling                 │   S6
+│           ▲                   │
+│      logits                   │   S3
+│           ▲                   │
+│      unembedding              │   S3
+│           ▲                   │
+│   ┌─────────────────────┐     │
+│   │ block 50–120        │     │   S2 attn
+│   │  attention + FFN    │     │   S3 FFN
+│   │   + residual + LN   │     │
+│   └─────────────────────┘     │
+│           ▲                   │
+│         ...                   │
+│           ▲                   │
+│   ┌─────────────────────┐     │
+│   │ block 1             │     │
+│   └─────────────────────┘     │
+│           ▲                   │
+│   ●  ●  ●  ●  ●               │   ← tonight · residual stream
+│           ▲                   │
+│   embedding lookup            │   ← tonight
+│           ▲                   │
+│   tokens (integer IDs)        │   ← tonight
+│           ▲                   │
+│   tokenizer                   │   ← tonight
+│           ▲                   │
+│   user message                │
+└───────────────────────────────┘
+```
 
 </div>
 
+<div>
+
+**Bottom of the stack** — covered tonight. Tokenizer, IDs, embedding lookup, residual stream.
+
+**Middle** — what each block actually computes. S2 attention, S3 the rest of the block.
+
+**Top** — how the final vector becomes a token (S3) and what the sampling knobs do (S6).
+
+**Outside the picture** — where parameters come from (S4 training), how requests run in production (S5 prefill/decode), how the harness wraps the model (S7–S9 agents).
+
+**S10 is one full agent turn through the whole stack.**
+
 </div>
+
+</div>
+
+<style>
+.loa-map pre, .loa-map .shiki {
+  font-size: 9.5px !important;
+  line-height: 1.15 !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+</style>
 
 <!--
 This diagram is going to come back, in some form, in every session of this course. I want to walk it with you.
@@ -994,36 +839,32 @@ You now know enough to recognize about a third of the labels in this map. By ses
 -->
 
 ---
+layout: default
+eyebrow: Where we are
+title: You have the substrate now.
+---
 
-## Where we are
+<div class="loa-cards cols-2">
 
-<div class="grid grid-cols-2 gap-8 pt-6">
-
-<div>
-
-**Tonight you learned**
-
-- Text becomes integers (tokenizer)
-- Integers become vectors (embedding table)
-- Vectors flow through a stack of blocks via the residual stream
-- Each block reads the stream and adds to it
-
-**You now have the substrate.** Everything from here is what each block computes, and what we do with the final stream.
-
+<div class="loa-card">
+  <div class="loa-card-kicker">Tonight</div>
+  <div class="loa-card-body">
+    <p>Text becomes integers — <strong>tokenizer</strong>.</p>
+    <p>Integers become vectors — <strong>embedding table</strong>.</p>
+    <p>Vectors flow through stacked blocks via the <strong>residual stream</strong>.</p>
+    <p>Each block <em>reads</em> the stream and <em>adds</em> to it.</p>
+  </div>
 </div>
 
-<div>
-
-**Coming up**
-
-- **S2**: attention — how each block reads from other positions
-- **S3**: the rest of a block, plus the full forward pass
-- **S4**: training — where every parameter came from
-- **S5**: prefill vs. decode — how it runs in production
-- **S6**: sampling, batching, paged attention
-- **S7–S9**: agents — the loop, context, failure modes
-- **S10**: the full walk
-
+<div class="loa-card is-accent">
+  <div class="loa-card-kicker">Coming up</div>
+  <div class="loa-card-body">
+    <p><strong>S2</strong> · attention — how each block reads from other positions.</p>
+    <p><strong>S3</strong> · the rest of a block + the full forward pass.</p>
+    <p><strong>S4</strong> · training — where every parameter came from.</p>
+    <p><strong>S5–S6</strong> · prefill vs. decode, sampling, serving at scale.</p>
+    <p><strong>S7–S9</strong> · agents. <strong>S10</strong> · the full walk.</p>
+  </div>
 </div>
 
 </div>
@@ -1039,16 +880,14 @@ Thank you for sitting through the foundations. The payoff starts compounding fro
 -->
 
 ---
-layout: end
+layout: section
+eyebrow: End of S1
+num: '→ S2'
 ---
 
-# See you next week
+# See you next week.
 
-<div class="text-sm opacity-60 pt-8">
-Slides: <code>github.com/.../sessions/01-foundations-i</code> &nbsp;·&nbsp;
-Demos: <code>github.com/.../demos/</code> &nbsp;·&nbsp;
-Recording: internal link in the calendar invite
-</div>
+## Next week: attention. How each block reads from the rest of the stream before it decides what to add.
 
 <!--
 The narrative companion document — basically these speaker notes turned into prose, with the demo screenshots and graphics inline — will land in the team folder by Friday. The recording will be cut and posted there too. The four demos you saw embedded are also live as standalone web pages; click into them, share configurations, screenshot anything interesting.

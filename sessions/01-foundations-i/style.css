@@ -131,12 +131,28 @@ html, body, #app {
   color: var(--loa-violet-600);
 }
 .loa-lede {
-  font-size: var(--loa-text-lg);
-  line-height: var(--loa-leading-snug);
+  font-size: 20px;
+  line-height: 1.45;
   color: var(--loa-ink-muted);
-  letter-spacing: var(--loa-tracking-snug);
-  max-width: 52ch;
+  letter-spacing: -0.012em;
+  max-width: 68ch;
+  margin-bottom: 32px;
 }
+.loa-lede strong { color: var(--loa-violet-700); font-weight: 600; }
+.loa-lede em     { font-style: italic; color: var(--loa-violet-800); }
+
+.loa-closer {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--loa-ink-muted);
+  max-width: 68ch;
+  padding-top: 16px;
+  margin-top: 24px;
+  border-top: 1px solid var(--loa-rule);
+}
+.loa-closer strong { color: var(--loa-violet-700); font-weight: 600; }
+.loa-closer em     { font-style: italic; color: var(--loa-violet-800); }
+
 .loa-caption {
   font-family: var(--loa-font-mono);
   font-size: var(--loa-text-xs);
@@ -168,6 +184,231 @@ html, body, #app {
   letter-spacing: var(--loa-tracking-eyebrow);
   text-transform: uppercase;
   color: var(--loa-ink-muted);
+}
+
+/* ─── card grid primitive — reused across most content slides ─── */
+.loa-cards {
+  display: grid;
+  gap: 16px;
+}
+.loa-cards.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.loa-cards.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.loa-cards.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.loa-card {
+  background: #fff;
+  border: 1px solid var(--loa-rule);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.loa-card.is-accent {
+  border-color: var(--loa-violet-200);
+  background: var(--loa-violet-050);
+}
+.loa-card.is-cobalt {
+  border-color: var(--loa-cobalt-100);
+  background: #f3f5ff;
+}
+.loa-card-kicker {
+  font-family: var(--loa-font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--loa-cobalt-600);
+}
+.loa-card.is-accent .loa-card-kicker {
+  color: var(--loa-violet-700);
+}
+.loa-card-body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--loa-ink);
+}
+.loa-card-body em  { color: var(--loa-violet-800); font-style: italic; }
+.loa-card-body strong { color: var(--loa-ink); font-weight: 600; }
+.loa-card-body p:first-child { margin-top: 0; }
+.loa-card-body p:last-child  { margin-bottom: 0; }
+.loa-card-body code {
+  font-family: var(--loa-font-mono);
+  font-size: 0.9em;
+  background: rgba(90, 75, 207, 0.08);
+  color: var(--loa-violet-800);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--loa-violet-100);
+}
+
+/* ─── numbered chain (for ordered journeys like "token → logits → next token") ─── */
+.loa-chain {
+  display: grid;
+  gap: 10px;
+}
+.loa-chain.cols-5  { grid-template-columns: repeat(5, 1fr); }
+.loa-chain.cols-10 { grid-template-columns: repeat(10, 1fr); }
+
+.loa-chain-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--loa-rule);
+  border-radius: 8px;
+}
+.loa-chain-step.is-accent {
+  background: var(--loa-gradient-brand);
+  border-color: transparent;
+  color: #fff;
+}
+.loa-chain-num {
+  font-family: var(--loa-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--loa-cobalt-600);
+}
+.loa-chain-step.is-accent .loa-chain-num { color: rgba(255, 255, 255, 0.7); }
+.loa-chain-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--loa-ink);
+}
+.loa-chain-step.is-accent .loa-chain-label { color: #fff; }
+
+/* ─── schedule list — indexed items (session mapping etc.) ─── */
+.loa-schedule {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 20px;
+  row-gap: 10px;
+  font-size: 14px;
+  max-width: 820px;
+}
+.loa-schedule-item {
+  color: var(--loa-ink);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--loa-rule-soft);
+}
+.loa-schedule-item em { color: var(--loa-violet-800); font-style: italic; }
+.loa-schedule-session {
+  font-family: var(--loa-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--loa-cobalt-600);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--loa-rule-soft);
+  white-space: nowrap;
+}
+.loa-schedule-session.is-now {
+  color: var(--loa-violet-700);
+}
+
+/* ─── callout block — for quotes, SRE takeaways, inline emphasis ─── */
+.loa-callout {
+  padding: 16px 20px;
+  border-left: 3px solid var(--loa-cobalt-600);
+  background: var(--loa-cobalt-100);
+  border-radius: 0 var(--loa-radius-md) var(--loa-radius-md) 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--loa-ink);
+}
+.loa-callout.is-violet {
+  border-color: var(--loa-violet-500);
+  background: var(--loa-violet-050);
+}
+.loa-callout b, .loa-callout strong {
+  color: var(--loa-violet-800);
+  font-weight: 600;
+}
+
+/* ─── pipeline diagram — code-style transform ─── */
+.loa-pipeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0 16px;
+}
+.loa-pipeline pre, .loa-pipeline .shiki {
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  font-size: 18px !important;
+  font-weight: 500;
+}
+.loa-pipeline-arrow {
+  font-family: var(--loa-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--loa-cobalt-600);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.loa-pipeline-arrow::before,
+.loa-pipeline-arrow::after {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--loa-rule);
+}
+
+/* ─── split (2-col prose block, no cards) ─── */
+.loa-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--loa-ink);
+}
+.loa-split p { margin: 0 0 10px; }
+.loa-split p:last-child { margin-bottom: 0; }
+.loa-split strong { color: var(--loa-violet-800); font-weight: 600; }
+
+/* ─── bullet row — a lightweight alternative to cards for quick observations ─── */
+.loa-observations {
+  display: grid;
+  gap: 12px;
+  max-width: 780px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.loa-observations > div {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  color: var(--loa-ink);
+}
+.loa-observations > div::before {
+  content: attr(data-n);
+  font-family: var(--loa-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--loa-cobalt-600);
+  letter-spacing: 0.06em;
+}
+.loa-observations strong { color: var(--loa-violet-800); font-weight: 600; }
+.loa-observations code {
+  font-family: var(--loa-font-mono);
+  font-size: 0.9em;
+  background: var(--loa-violet-050);
+  color: var(--loa-violet-800);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--loa-violet-100);
 }
 
 /* ─── persistent brand mark — bottom-left of every content slide ─── */
@@ -294,10 +535,19 @@ html, body, #app {
 .slidev-vclick-hidden { opacity: 0.12 !important; transform: translateY(2px); }
 
 /* ─── embedded demo iframes — frame as part of the deck ─── */
-.slidev-layout iframe {
+/* Only applies to inline iframes; full-bleed demo layout gets zero chrome. */
+.slidev-layout:not(.demo) iframe {
   border: 1px solid var(--loa-rule) !important;
   border-radius: var(--loa-radius-md) !important;
   box-shadow: var(--loa-shadow-soft);
+  background: var(--loa-paper);
+}
+.slidev-layout.demo,
+.slidev-layout.demo iframe {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   background: var(--loa-paper);
 }
 
