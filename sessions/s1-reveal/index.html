@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life of an Agent — S1 (reveal spike)</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body class="loa-scope">
+    <div class="reveal">
+      <div class="slides">
+
+        <!-- ─── 1. Cover ─── -->
+        <section data-layout="cover" data-background-color="#5a4bcf">
+          <div class="loa-slide cover">
+            <div class="cover-eyebrow">Session 1 · Foundations I</div>
+            <h1>From Text to Vectors</h1>
+            <h2>
+              A single piece of text, traced end to end — from the moment it
+              arrives at the model to the moment a number comes out the other side.
+            </h2>
+            <div class="cover-meta">
+              <span><b>~45 min</b> content</span>
+              <span class="cover-dot">·</span>
+              <span><b>15 min</b> Q&amp;A</span>
+              <span class="cover-dot">·</span>
+              <span>4 interactive demos</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── 2. Section opener: Housekeeping ─── -->
+        <section data-layout="section" data-background-color="#3d2e87">
+          <div class="loa-slide section">
+            <div class="section-eyebrow">Housekeeping · 0</div>
+            <h1>A warning and a promise.</h1>
+            <h2>Two pieces of housekeeping before the technical material starts.</h2>
+          </div>
+        </section>
+
+        <!-- ─── 3. The warning (3-card grid) ─── -->
+        <section data-layout="default">
+          <div class="loa-slide default">
+            <div class="slide-eyebrow">The warning</div>
+            <h1 class="slide-title">This course is theory first. Agents come at the end.</h1>
+
+            <p class="warning-lede">
+              Most LLM courses start at the surface and try to work inward.
+              <strong>We're doing the opposite</strong> — walking the trunk before the branches.
+            </p>
+
+            <div class="warning-grid">
+              <div class="warning-card">
+                <div class="warning-card-kicker">What this means</div>
+                <div class="warning-card-body">
+                  The first three or four sessions are going to feel <em>slow</em>.
+                  You will know more than you can yet do anything with. That's normal —
+                  the same shape as any CS curriculum.
+                </div>
+              </div>
+              <div class="warning-card">
+                <div class="warning-card-kicker">Why it works for SREs</div>
+                <div class="warning-card-body">
+                  You already think in layers. By S6, when we get to prefill vs. decode,
+                  the foundations pay off in ways they wouldn't if we'd skipped them.
+                </div>
+              </div>
+              <div class="warning-card is-accent">
+                <div class="warning-card-kicker">The honest part</div>
+                <div class="warning-card-body">
+                  Some of you will get frustrated. <em>"When do we get to the interesting stuff?"</em>
+                  Call it out. I'll keep reminding you where we are on the trunk.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── 4. The promise (numbered chain) ─── -->
+        <section data-layout="default">
+          <div class="loa-slide default">
+            <div class="slide-eyebrow">The promise</div>
+            <h1 class="slide-title">By session 10, you'll walk a single agent turn through every layer.</h1>
+
+            <p class="promise-lede">
+              Every word in the sequence below will mean something specific and
+              mechanical — not a metaphor, not a hand-wave.
+            </p>
+
+            <div class="promise-chain">
+              <div class="promise-step"><span class="promise-num">01</span><span class="promise-label">token in</span></div>
+              <div class="promise-step"><span class="promise-num">02</span><span class="promise-label">embedding lookup</span></div>
+              <div class="promise-step"><span class="promise-num">03</span><span class="promise-label">attention</span></div>
+              <div class="promise-step"><span class="promise-num">04</span><span class="promise-label">residual stream</span></div>
+              <div class="promise-step"><span class="promise-num">05</span><span class="promise-label">logits</span></div>
+              <div class="promise-step"><span class="promise-num">06</span><span class="promise-label">sampling</span></div>
+              <div class="promise-step"><span class="promise-num">07</span><span class="promise-label">tool call</span></div>
+              <div class="promise-step"><span class="promise-num">08</span><span class="promise-label">harness dispatch</span></div>
+              <div class="promise-step"><span class="promise-num">09</span><span class="promise-label">result</span></div>
+              <div class="promise-step is-accent"><span class="promise-num">10</span><span class="promise-label">next token</span></div>
+            </div>
+
+            <p class="promise-closer">
+              Nothing in there is magic. It's layers of math with engineering choices
+              on top, and the engineering choices are where your latency, cost, and
+              reliability intuitions come from.
+            </p>
+          </div>
+        </section>
+
+        <!-- ─── 5. Demo iframe (embedding scatter) ─── -->
+        <section data-layout="demo">
+          <div class="loa-slide demo">
+            <div class="demo-chrome">
+              <div class="demo-chrome-kicker">S1 · Demo 3</div>
+              <div class="demo-chrome-title">Embedding scatter — vectors carry meaning</div>
+            </div>
+            <div class="demo-frame">
+              <iframe src="__DEMO_URL_EMBEDDING__" title="Embedding scatter demo"></iframe>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── 6. Section closer ─── -->
+        <section data-layout="section" data-background-color="#3d2e87">
+          <div class="loa-slide section">
+            <div class="section-eyebrow">End of spike · A</div>
+            <h1>That's the reveal.js port, six slides deep.</h1>
+            <h2>No goto-dialog, no editor pane, no stock chrome fighting the brand.</h2>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

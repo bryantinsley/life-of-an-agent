@@ -1,0 +1,18 @@
+{
+  "name": "@life-of-an-agent/s1-reveal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3040 --strictPort",
+    "build": "vite build --base ./",
+    "preview": "vite preview --port 3040"
+  },
+  "dependencies": {
+    "@life-of-an-agent/brand": "workspace:*",
+    "reveal.js": "^5.1.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
