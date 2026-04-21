@@ -12,6 +12,7 @@ drawings:
   persist: false
 transition: slide-left
 mdc: true
+editor: false
 ---
 
 # From Text to Vectors

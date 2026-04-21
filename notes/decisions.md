@@ -69,3 +69,17 @@ Running record of decisions made during production. New entries at the bottom. E
 - **Status:** agreed in principle, not yet implemented. Current `tokenizer-explorer` still uses cl100k_base. Swap is pending after visual refit lands. In-browser runtime options: `@huggingface/transformers` (heavier, ~MB) or a pure-JS SentencePiece port (lighter). Defer the choice until implementation.
 
 ---
+
+## 2026-04-20 — Slidev vs Reveal.js (stay)
+
+### D9. Stay on Slidev; spike preserved on `spike/s1-reveal` branch
+
+- Mid-day, Slidev's goto-dialog (`#slidev-goto-dialog`) was showing as a persistent right-third panel in built output, covering content. This followed earlier fights with the overview mode and presenter route. Reveal.js spike was built (6 slides, `sessions/s1-reveal/`, 112KB JS vs Slidev's ~1MB) to compare side-by-side.
+- Resolution: **Slidev looks better and the chrome bleed is fully fixable with flags + CSS.** Fixes that now stick:
+  - `editor: false` in frontmatter → strips dev editor bundle from build.
+  - CSS rule `#slidev-goto-dialog { display: none !important }` → hides the jump-to-slide dialog (`g`) that was leaking visible.
+  - `contextMenu: true` (default) kept → right-click menu provides access to Presenter Mode, Overview, PDF export.
+  - Presenter route fix (earlier commit `866368e`) stamps `presenter/index.html` so GH Pages routing resolves the SPA.
+- **Speaker view access:** right-click on slide → Presenter Mode, OR navigate directly to `/sessions/s1/presenter/`.
+- **Why kept Slidev:** markdown-first authoring ergonomics + Vue components (only `<BrandMark>` used today, but more planned for S2+). Reveal would have required HTML-per-slide and lose markdown fidelity.
+- **Why spike preserved:** `spike/s1-reveal` branch kept as a fallback lever in case Slidev bites us again on a deeper issue. Not merged.

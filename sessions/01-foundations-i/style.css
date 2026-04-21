@@ -324,3 +324,21 @@ html, body, #app {
   border-radius: var(--loa-radius-md);
   box-shadow: var(--loa-shadow-soft);
 }
+
+/* Defensive: hide the Slidev dev editor pane if it leaks into the built deck.
+   The `e` keyboard shortcut persists editor visibility to localStorage; on a
+   built deck we never want it visible. `editor: false` in frontmatter should
+   strip it entirely, but this belt-and-suspenders makes sure. */
+html:not(.slidev-is-dev) .slidev-show-editor .slidev-editor,
+html:not(.slidev-is-dev) .slidev-editor,
+html:not(.slidev-is-dev) [class*="slidev-editor"],
+html.slidev-show-editor .slidev-editor { display: none !important; }
+
+html.slidev-show-editor { --slidev-editor-width: 0 !important; }
+html .slidev-show-editor { --slidev-editor-width: 0 !important; }
+
+/* Slidev's jump-to-slide dialog (#slidev-goto-dialog) is opened with `g`
+   and its visibility is persisted to localStorage. Hide it outright —
+   attendees don't need this, and we can navigate by arrow keys + overview. */
+#slidev-goto-dialog,
+.slidev-goto-dialog { display: none !important; }
