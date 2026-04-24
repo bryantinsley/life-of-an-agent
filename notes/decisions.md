@@ -83,3 +83,37 @@ Running record of decisions made during production. New entries at the bottom. E
 - **Speaker view access:** right-click on slide → Presenter Mode, OR navigate directly to `/sessions/s1/presenter/`.
 - **Why kept Slidev:** markdown-first authoring ergonomics + Vue components (only `<BrandMark>` used today, but more planned for S2+). Reveal would have required HTML-per-slide and lose markdown fidelity.
 - **Why spike preserved:** `spike/s1-reveal` branch kept as a fallback lever in case Slidev bites us again on a deeper issue. Not merged.
+
+---
+
+## 2026-04-23 — Reset to 3-session "applicable" course
+
+### D10. Genuine reset from 10 sessions → 3 sessions, applicable-leaning
+
+- Bryan goes on paternity leave after the third session. Rather than start a 10-session arc and leave the team without continuity, the new plan is 3 self-contained sessions weighted toward applied / operational understanding over theoretical depth.
+- The 10-session master outline (`course_master_outline.md`) is **paused, not deleted** — Bryan may return to it during leave. Existing S1 Slidev deck, four interactive demos, and brand system stay in the repo as-is for possible future revival.
+- **How to apply:** Stop adding to the 10-session outline / S1 Slidev deck. New work goes into a fresh 3-session outline + per-session content docs.
+
+### D11. Content-first, deck-agnostic prose for Claude Design handoff
+
+- Bryan plans to hand the worked-up content to Claude Design to produce the actual decks. Source-of-truth artifact is **prose + structured outline** (per-slide intent, key claim, visual hint, speaker notes), not Slidev markup.
+- Claude Design will see **only the prose content** — not the existing S1 deck, demos, or brand system. This is to give Design genuine room to make visual choices instead of re-skinning the existing artifact.
+- **How to apply:** When drafting, structure each session as a content doc that a designer (human or AI) could turn into slides without needing access to the rest of the repo. Avoid Slidev-specific syntax in the content docs.
+
+### D12. Static visualizations OK; interactive demos not a requirement
+
+- Interactive iframe demos were a 10-session-era investment. For the 3-session reset, static visualizations / diagrams are sufficient — and easier for Claude Design to produce in standard deck formats.
+- Specific visualizations called out so far: **context-size scaling** (cost/latency curves vs context length), **cost of a prefix-cache miss** (e.g. dollar / latency delta on cold vs warm prefix).
+- **How to apply:** When a topic benefits from a visualization, note it as a "visual hint" in the content doc with enough description that Design can produce it. Don't build interactive demos for the 3-session arc unless we identify one that genuinely earns its keep.
+
+### D13. Must-include topic: prefix caching as cloud-provider economics
+
+- Beyond "what prefix caching is mechanically," the course must cover the **operational reality of cloud-provider prefix caches**: you pay for cache writes, you have to design for cache key stability, and entries are subject to TTL eviction.
+- **Why:** SREs will own this in production. Cache key churn from chatty system prompts or non-deterministic context assembly silently kills hit rate and inflates bills. TTL means "warm" isn't permanent — long-idle agents pay cold-start every time. This is exactly the applied/operational angle the reset is leaning into.
+- **How to apply:** Reserve a dedicated block in whichever session covers inference economics. Treat it as parallel to other caching disciplines SREs already know (CDN keys, memcached TTLs) — that bridge is the pedagogical hook.
+
+### D14. Success criteria: insight, curiosity, reframing — not recall
+
+- The course succeeds if attendees (a) **learn at least one thing they didn't know**, (b) get **curious about something they didn't even know existed**, and (c) leave with **stuff they already knew reframed in a more useful way**. It does *not* need to leave them able to pass a quiz on the material.
+- **Why:** the audience is 12 SREs Bryan knows well, with one 45-min session each. Optimizing for comprehensive coverage / retention would force shallow treatment of every topic; optimizing for insight + curiosity + reframing lets each section go deep enough to land. Bryan is also explicit that he prefers trimming over padding — better to draft long with strong material and cut, than draft tight and pad.
+- **How to apply:** when judging whether a section earns its time, ask "does this drop a real insight, spark a curiosity hook, or reframe something they already think they know?" If none of the three, cut it. Don't add "completeness" content (e.g. obligatory definitions, exhaustive enumerations) just because the topic technically warrants it. Draft generously; trim aggressively.
