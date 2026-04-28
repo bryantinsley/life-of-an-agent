@@ -31,6 +31,8 @@ For each block:
 
 ## Voice and tone
 
+**Sessions are daytime.** Attendees are between 8am–4pm in their local timezones. Do not use "tonight" or evening-oriented language anywhere in slide copy or speaker notes. "Today" is the right word.
+
 **Register: small room, not stage.** The audience is 12 SREs Bryan knows personally. Write the way you'd explain something to colleagues over lunch — direct, a little relaxed, no performance. Not: "And that's the key insight. Let that sink in." Yes: "The thing that trips people up here is X."
 
 No rhetorical buildup, no dramatic reveals, no "at the end of this session you will…" preamble. Just start talking about the thing.
