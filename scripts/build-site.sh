@@ -65,6 +65,10 @@ pnpm build > /dev/null
 cp -r dist/. "$SITE/"
 popd > /dev/null
 
+echo "==> copy design-s1 static deck"
+mkdir -p "$SITE/sessions/design-s1"
+cp -r "$ROOT/sessions/design-s1/." "$SITE/sessions/design-s1/"
+
 # A bare 404 helps GH Pages SPAs and bad links land somewhere readable.
 cp "$SITE/index.html" "$SITE/404.html"
 

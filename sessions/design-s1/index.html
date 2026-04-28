@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Life of an Agent — Session 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<script src="deck-stage.js"></script>
+<script type="application/json" id="speaker-notes">
+[
+  "Three sessions, forty-five minutes each, nothing scheduled after so we can run long if it's useful. Today's the loop and what's inside the model on the other end of it. Interrupt me whenever — this is small enough that it should feel like a conversation.",
+
+  "Part one — the loop. What an agent is actually doing, turn by turn.",
+
+  "Real task. Somebody hands the agent a bug report and says 'draft a code change to fix this.' I want to walk this at human speed, one turn at a time. The thing that trips people up is assuming there's something exotic under the hood. There isn't.",
+
+  "Turn one. The user message lands in the context window alongside the system prompt. The model produces a message. In this case the message is: 'I need to look at the file first.' But the model doesn't just say that in prose — it emits a structured tool call. The model is producing tokens; some of those tokens are formatted as a tool invocation that the harness knows how to parse.",
+
+  "The harness pattern-matches that tool call, runs the actual read_file — a normal function, on a real filesystem, written by whoever built the harness — and gets a result. The result gets formatted as a new message and appended to the context window. The model didn't run anything. The harness ran it. The model just emitted text that looked like a tool call.",
+
+  "Turn two. The model sees everything from turn one — the user message, the system prompt, its own last message with the tool call, and now the tool result — and generates its next message. Maybe it calls another tool. Maybe it writes code. Maybe it says 'I'm done, here's the patch.' When the model signals done, or the harness decides to stop, the loop exits.",
+
+  "Abstracted, that's the whole loop. Model produces a message. Message may contain tool calls. Harness runs the tools. Results go back into context. Repeat until done. If you've ever written a REPL that dispatches commands to subprocesses and feeds the output back in, you've written this loop. The Anthropic harness docs say it out loud: the runtime is a dumb loop. All the intelligence is in the model.",
+
+  "The harness is dumb on purpose. It's a while loop with a switch statement. Everything that makes a coding agent feel smart is happening inside the model call. Which means when an agent is behaving badly, the first place to look isn't the harness. It's what's in the context window that the model is reading.",
+
+  "Which brings us to the system prompt. Every one of those model calls — every turn — the harness pins the system prompt to the top of the context window. It's re-injected, every single turn. It's not stored somewhere the model accesses later; it's just always there at the top of the window. That's what makes it load-bearing.",
+
+  "And the system prompt isn't just a paragraph. It's a compiled surface. Tool descriptions get compiled in so the model knows what's callable. Project-conventions files like CLAUDE.md get compiled in. Skills, hooks, operating rules. Everything you think of as 'how I configured the agent' ends up in this one re-injected blob. When you're trying to figure out why an agent behaves the way it does, this is where you look first.",
+
+  "Now — the context window. The context window is the model's entire world for a given call. There is no memory outside of it. When people ask 'why did the agent forget what I told it' — it didn't forget. The information was never in scope. Either it scrolled out, or it got compacted, or it was in a different session and was never in this window to begin with. LLMs are architecturally stateless. Every call starts fresh. The illusion of memory is engineered by re-injecting history.",
+
+  "The context window is measured in tokens, not words. A token is roughly three to four characters of English prose. Denser for code — symbols and keywords tokenize compactly. Every tool result, every file read, every turn of the conversation has a token price, and that compounds across a multi-turn run. Two-hundred-K context sounds like a lot. It is. But it's not unlimited, and it fills faster than you'd expect in a real run.",
+
+  "Concretely: a 128K context window holds about 90,000 words of English prose. Short novel. Code is denser, so maybe 200K lines of typical source. A single recursive file listing can chew tens of thousands of tokens. Mental model: treat tokens like you treat bytes on the wire. Cheap per-unit, expensive in aggregate, and you're paying for them every turn.",
+
+  "One more thing about context before we move on, because it shapes a lot of what comes later. Attention cost grows quadratically in context length. Self-attention computes pairwise relationships between every pair of tokens, so doubling the window doesn't double the FLOPs per token — it roughly quadruples them. In practice prefix caching, sliding windows, and chunked attention soften the constant factor, but the shape doesn't change. Practical implication: a 200K-token turn isn't six times more expensive than a 32K turn — it's closer to forty times. An agent that lets its context grow unbounded is buying a quadratic bill. Compaction and trimming aren't UX polish; they're cost control. We'll see this curve again next session when we get to prefill versus decode and prefix caching.",
+
+  "That's the loop, the system prompt, and the context window. Now the thing that's actually generating the messages — because what's inside 'the model' has changed substantially in the last couple of years.",
+
+  "Part two — what's inside the model.",
+
+  "Quick vocabulary check before we dive in, because every model card you'll read uses these five words and conflates them at your peril. Context window: how many tokens fit in one call — the model's working memory, 128K to 1M. Total parameters: weights on disk, what it costs to host. Active parameters: weights that fire per token, what you pay in FLOPs. On a dense model these two numbers are identical; on MoE they aren't. Sparsity is the ratio — total divided by active — a thirty-times sparsity means one in thirty weights does work for any given token. Knowledge cutoff: the last date in the pre-training corpus. Anything after that date is invisible to the base model unless you put it in the context window. We're going to unpack each of these. The active-versus-total split is where most people's mental model is a generation behind.",
+
+  "Quick level-set on how a forward pass works, at the level we need. Dense model. A prompt comes in, every parameter in the network participates in producing every output token. If it's a seventy-billion-parameter dense model, every one of those seventy billion weights gets multiplied for every single token you produce. No sparsity, no routing, no skipping. Simple, consistent, expensive. This was the standard architecture until pretty recently.",
+
+  "Mixture-of-experts is different. Each feed-forward layer isn't one big block — it's a bank of smaller 'experts,' and there's a little router that picks which two, or four, or eight of them to activate for each token. The rest sit idle for that token. Which means the total weights you have to host can be huge — half a trillion parameters, more — but the per-token compute is whatever the active subset is. The router decides, per token, which specialists answer.",
+
+  "So 'how big is the model' isn't one number anymore. It's two. Total parameters: what you need to host. Active parameters: what fires per token, what you actually pay for in FLOPs per token. In MoE these can differ by 10x, 20x, 30x. The old mental model — one parameter count tells you everything — breaks down. When you see 'four-hundred-billion parameter model,' the first question is 'active or total?'",
+
+  "To make the gap concrete: imagine a model with around half a trillion parameters total, but only around thirty billion active per token. The total tells you what it costs to keep the model loaded — hosting, memory footprint. The active tells you what each token of inference actually costs. The dense reference at the bottom is the old shape, where the two numbers were the same. The trick of MoE is that you can scale capacity — the total — without scaling the per-token compute proportionally.",
+
+  "Every frontier lab ships MoE. Gemini has been sparse mixture-of-experts since 1.5 — Google says so directly in the technical report, though the active-versus-total split itself isn't published. GPT-4-class models are widely reported to be MoE, even if OpenAI hasn't formally confirmed the topology. And on the open-weights side — Mixtral, DeepSeek, Qwen — they're all MoE, and their active and total numbers are public. Point being: if you've been carrying around a dense-model intuition where one parameter count tells you everything, that intuition is a generation behind the production frontier. The model on the other end of every product you use is almost certainly sparse.",
+
+  "What this implies about how an MoE model 'thinks' is interesting. It isn't one homogeneous network considering every part of your prompt with all of its weight. It's a router sending each token to a small subset of specialists. Some experts end up specialized in code, some in dialog, some in math — the router learned those assignments during training, nobody hand-wires them. On a hard interdisciplinary question, different tokens get routed to different specialists, and the output is stitched together from their contributions. 'Committee of specialists' is a closer metaphor than 'one big brain.'",
+
+  "Different topic, same model. Post-training. RLHF, RLAIF, instruction tuning — the phase after the base model is pre-trained. What does post-training actually do? It shapes behavior. Tone, format, helpfulness, tool-call discipline, the shape of responses. It doesn't put new facts into the model. It teaches the already-knowledgeable base model how to be useful. Which means fine-tuning — the thing you can do downstream — can change style, format adherence, tool-call discipline. It's a behavior knob. What it can't do, reliably, is teach the model new facts. Knowledge uptake via fine-tuning is weak, expensive, and brittle. And it doesn't raise the reasoning ceiling that pre-training set. So when the question is 'can we fine-tune the model on our runbooks so it knows our internals' — that's not a training problem. That's a context-window problem. You retrieve the runbooks at query time and put them in context. Wrong layer, wrong tool — it's not what fine-tuning is for.",
+
+  "Now let's talk about what's actually going on when you use one of these hosted coding agents — Antigravity, AI Studio, Claude Code on the consumer side. They're surfaces over an inference service. You're getting access to the current state-of-the-art model, and the cost is inference compute. The weights aren't yours — you don't license them, you don't host them. And the provider upgrades the model underneath you, sometimes on a timeline you don't control.",
+
+  "What that means for using the tools you've been given — Gemini variants, Jetski, Jetski CLI, Jetski Chat — is that the thing on the other end of the harness has a half-life measured in months, not years. The model you're talking to in April isn't the same product in October, even if the URL doesn't change. So the operational instincts that already work — monitor what's actually deployed, watch for behavior drift, have a fallback plan when something changes underneath you — those carry over directly.",
+
+  "Recap. The loop is a dumb while loop — the smarts live in the model call. The system prompt is a compiled, re-injected instruction surface, and it's where most of the operational leverage lives. Model size is two numbers now, active and total — and every frontier lab is MoE. And when the ask is 'teach it our stuff,' the answer is retrieval into context, not fine-tuning the weights.",
+
+  "Next week. Session two. Extending the agent — tools, MCP, skills, sub-agents — and then how inference actually runs. Prefill versus decode. Prefix caching as cloud-provider economics. That's it from me. Floor's yours — what's worth digging into?"
+]
+</script>
+</head>
+<body>
+<deck-stage width="1920" height="1080">
+
+  <!-- 1 — Cover -->
+  <section data-accent="cold" data-label="01 Cover">
+    <div class="opener-inner">
+      <div class="opener-main" style="padding: 96px;">
+        <div style="font-family: var(--mono); font-size: 24px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint);">
+          Life of an Agent · Session 01 of 03
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom: 36px;">The agent loop · and what's inside the model</div>
+          <h1 class="title-xl" style="font-size: 210px;">
+            Life of<br/>an <span class="accent">agent</span>.
+          </h1>
+          <p class="lede" style="margin-top: 56px; font-size: 44px; max-width: 1200px;">
+            What it actually does, turn by turn — and what's inside the thing on the other end of the loop.
+          </p>
+        </div>
+        <div style="display:flex; gap:48px; font-family: var(--mono); font-size: 24px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase;">
+          <span>Week 1 of 3</span>
+          <span>·</span>
+          <span>Internal only</span>
+        </div>
+      </div>
+      <div class="opener-block" style="padding: 96px 64px;">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.12em;">01 / 03</div>
+        <div>
+          <div style="font-size: 20px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; opacity: 0.7;">Today</div>
+          <div style="font-family: var(--sans); font-size: 36px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 18px;">The loop.</div>
+          <div style="font-family: var(--sans); font-size: 36px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 18px;">The context window.</div>
+          <div style="font-family: var(--sans); font-size: 36px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em;">What's inside the model.</div>
+        </div>
+        <div style="font-size: 22px; font-weight: 700;">Bryan Tinsley</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 — Section opener: The loop -->
+  <section data-accent="loop" class="section-opener" data-label="02 Part 1 opener">
+    <div class="opener-inner">
+      <div class="opener-main">
+        <div style="font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint);">
+          Part 01 · Block 1.1
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom: 40px;">What an agent actually does</div>
+          <h2 class="title-xl" style="font-size: 260px;">
+            The<br/><span class="accent">loop</span>.
+          </h2>
+        </div>
+        <div style="font-family: var(--mono); font-size: 22px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase;">
+          Block 1.1
+        </div>
+      </div>
+      <div class="opener-block">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.12em;">01 / 02 BLOCKS</div>
+        <div style="font-family: var(--sans); font-size: 32px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em;">
+          A real turn, walked end-to-end. Then the abstraction. Then the system prompt and the context window.
+        </div>
+        <div style="font-size: 22px; font-weight: 700;">Block 1.1</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 — Real task -->
+  <section data-accent="loop" data-label="03 Real task">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · The loop</span><span>03</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">A real task</div>
+      <h2 class="title-l" style="max-width: 1700px;">
+        "Here's a bug report.<br/><span class="accent">Draft a code change</span> that fixes it."
+      </h2>
+      <div class="mono-note" style="margin-top: 72px; font-size: 28px;">
+        I'm going to walk one full turn. At human speed. Nothing mysterious under the hood.
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 — Turn 1 part A -->
+  <section data-accent="loop" data-label="04 Turn 1 model msg">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Turn 1</span><span>04</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">Turn 1 — the model's first message</div>
+      <h2 class="title-m" style="margin-bottom: 48px;">The model emits tokens.<br/>Some of them are <span class="accent">shaped like a tool call.</span></h2>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 24px;">
+        <div class="panel">
+          <div class="tag" style="margin-bottom: 20px;">context window · top</div>
+          <div class="mono-note" style="white-space: pre-wrap;">SYSTEM: You are Claude, a coding agent.
+You have tools: read_file, edit_file,
+run_tests, ...
+
+USER: Here's bug #4821. The rate
+limiter is throwing on empty batches.
+Draft a fix.</div>
+        </div>
+        <div class="panel" style="border-color: var(--accent);">
+          <div class="tag accent" style="margin-bottom: 20px;">assistant message · turn 1</div>
+          <div class="mono-note" style="white-space: pre-wrap; color: var(--ink);"><span class="accent">"I need to look at the file first."</span>
+
+{ <span class="accent">tool</span>: "read_file",
+  <span class="accent">args</span>: {
+    path: "src/rate_limiter.py"
+  }
+}</div>
+        </div>
+      </div>
+
+      <div class="mono-note" style="margin-top: 40px;">
+        // The model didn't run anything. It produced text formatted as a tool call.
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 — Harness runs the tool -->
+  <section data-accent="loop" data-label="05 Harness runs tool">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Turn 1</span><span>05</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">The harness does the work</div>
+      <h2 class="title-m" style="margin-bottom: 56px; max-width: 1700px;">
+        The harness pattern-matches the tool call, runs <span class="kw">a real function on a real filesystem,</span> and appends the result to context.
+      </h2>
+
+      <!-- Simple flow diagram -->
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 32px; align-items: center;">
+        <div class="panel" style="text-align: center; padding: 40px 24px;">
+          <div class="tag" style="margin-bottom: 16px;">model output</div>
+          <div class="mono-note" style="color: var(--accent); font-size: 20px;">read_file(<br/>"src/rate_limiter.py")</div>
+        </div>
+        <div style="font-family: var(--mono); font-size: 32px; color: var(--accent);">→</div>
+        <div class="panel" style="text-align: center; padding: 40px 24px; background: var(--accent); color: var(--ink-accent); border-color: transparent;">
+          <div style="font-family: var(--mono); font-size: 20px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; opacity: 0.8;">harness</div>
+          <div style="font-family: var(--sans); font-size: 28px; font-weight: 700;">fs.readFile()</div>
+          <div style="font-family: var(--mono); font-size: 18px; margin-top: 12px; opacity: 0.7;">a real function</div>
+        </div>
+        <div style="font-family: var(--mono); font-size: 32px; color: var(--accent);">→</div>
+        <div class="panel" style="text-align: center; padding: 40px 24px;">
+          <div class="tag" style="margin-bottom: 16px;">tool result → context</div>
+          <div class="mono-note" style="font-size: 20px;">def allow(batch):<br/>&nbsp;&nbsp;n = len(batch)<br/>&nbsp;&nbsp;return self.rate / n</div>
+        </div>
+      </div>
+
+      <div class="mono-note" style="margin-top: 56px;">
+        // Rule: the model generates tokens. The harness executes side effects.
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 — Turn 2 -->
+  <section data-accent="loop" data-label="06 Turn 2">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Turn 2</span><span>06</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">Turn 2 — model sees the result, keeps going</div>
+      <h2 class="title-m" style="margin-bottom: 40px; max-width: 1700px;">
+        Every turn, the model re-reads <span class="accent">the whole window</span> — system prompt, user message, prior turns, tool results — and produces its next move.
+      </h2>
+
+      <div class="panel" style="padding: 40px 48px;">
+        <div class="tag" style="margin-bottom: 24px;">context window · now</div>
+        <div class="mono-note" style="white-space: pre-wrap;">
+<span class="faint">[system prompt]
+[user: bug #4821 ...]
+[assistant: "I need to look..." + tool_call(read_file)]</span>
+[tool_result: def allow(batch): n = len(batch); return self.rate / n]
+<span class="accent">[assistant: "Division by zero on empty batch. Here's the fix..." + tool_call(edit_file)]</span>
+        </div>
+      </div>
+
+      <div class="mono-note" style="margin-top: 40px;">
+        // Next turn. Maybe more tools. Maybe the final patch. Loop until <span class="accent">done</span>.
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 — The loop as state diagram -->
+  <section data-accent="loop" data-label="07 Loop diagram">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · The loop, abstracted</span><span>07</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">That's the whole thing</div>
+      <h2 class="title-m" style="margin-bottom: 48px;">The control structure, in full.</h2>
+
+      <!-- SVG state diagram -->
+      <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 1600 560" style="width: 100%; max-width: 1600px;">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="#d8ff3a"/>
+            </marker>
+          </defs>
+          <!-- Nodes -->
+          <g font-family="'Inter Tight', sans-serif" font-weight="700" fill="#f2efe6">
+            <!-- Model -->
+            <rect x="60" y="200" width="340" height="160" fill="none" stroke="#d8ff3a" stroke-width="3"/>
+            <text x="230" y="262" text-anchor="middle" font-size="44">MODEL</text>
+            <text x="230" y="312" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#d8ff3a" opacity="0.85">emits tokens</text>
+
+            <!-- Harness -->
+            <rect x="620" y="200" width="340" height="160" fill="#d8ff3a" stroke="none"/>
+            <text x="790" y="262" text-anchor="middle" font-size="44" fill="#141310">HARNESS</text>
+            <text x="790" y="312" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#141310" opacity="0.75">parses · dispatches</text>
+
+            <!-- Tools / world -->
+            <rect x="1180" y="200" width="340" height="160" fill="none" stroke="#d8ff3a" stroke-width="3"/>
+            <text x="1350" y="262" text-anchor="middle" font-size="44">TOOLS</text>
+            <text x="1350" y="312" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#d8ff3a" opacity="0.85">side effects</text>
+
+            <!-- Forward arrows -->
+            <path d="M 400 260 L 610 260" stroke="#d8ff3a" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+            <text x="505" y="240" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#f2efe6" opacity="0.7">tool_call</text>
+
+            <path d="M 960 260 L 1170 260" stroke="#d8ff3a" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+            <text x="1065" y="240" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#f2efe6" opacity="0.7">invoke</text>
+
+            <!-- Return arrows -->
+            <path d="M 1170 320 Q 960 440 790 400 Q 620 440 400 320" stroke="#d8ff3a" stroke-width="3" fill="none" marker-end="url(#arr)" stroke-dasharray="6 6" opacity="0.9"/>
+            <text x="790" y="470" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#f2efe6" opacity="0.7">result → context → next turn</text>
+
+            <!-- Exit arrow -->
+            <path d="M 230 200 L 230 120 L 1050 120" stroke="#f2efe6" stroke-width="2" fill="none" marker-end="url(#arr)" opacity="0.4"/>
+            <text x="640" y="100" text-anchor="middle" font-size="20" font-family="'JetBrains Mono', monospace" fill="#f2efe6" opacity="0.5">when done → exit</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="mono-note" style="margin-top: 24px; text-align: center;">
+        while not done: message = model(context); if tool_calls: context += run(tool_calls); else: done = True
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 — Reframe #1 -->
+  <section data-accent="loop" data-label="08 Reframe 1">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Reframe</span><span>08</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">Reframe #1</div>
+      <h2 class="title-l" style="max-width: 1700px;">
+        The harness is <span class="accent">dumb on purpose.</span>
+      </h2>
+      <p class="lede" style="margin-top: 56px; max-width: 1500px; font-size: 42px;">
+        It's a while loop with a switch statement. All the intelligence lives in the model call.
+      </p>
+      <div class="mono-note" style="margin-top: 64px; max-width: 1600px; font-size: 26px;">
+        // If your agent is misbehaving, your first instinct shouldn't be "the harness is wrong."
+        <br/>// It should be <span class="accent">"what's in the context window that the model is reading?"</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 — System prompt is load-bearing -->
+  <section data-accent="loop" data-label="09 System prompt">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · The system prompt</span><span>09</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">Where most of your operational leverage lives</div>
+      <h2 class="title-l" style="max-width: 1700px; margin-bottom: 56px;">
+        Re-injected <span class="accent">every turn.</span>
+      </h2>
+      <p class="lede" style="font-size: 40px; max-width: 1500px;">
+        The harness pins it to the top of every turn's context window. Everything else is transient — once it scrolls out or gets compacted, it's gone.
+      </p>
+    </div>
+  </section>
+
+  <!-- 12 — System prompt contents -->
+  <section data-accent="loop" data-label="10 System prompt contents">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · System prompt</span><span>10</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">What it actually contains</div>
+      <h2 class="title-m" style="margin-bottom: 56px;">The "system prompt" is a <span class="accent">compiled surface.</span></h2>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+        <div class="panel"><div class="tag" style="margin-bottom: 16px;">persona</div><div class="body-md">Personality, voice, refusals, style rules.</div></div>
+        <div class="panel"><div class="tag" style="margin-bottom: 16px;">tool defs</div><div class="body-md">Schemas & descriptions for every callable tool.</div></div>
+        <div class="panel"><div class="tag" style="margin-bottom: 16px;">CLAUDE.md</div><div class="body-md">Project conventions, repo map, do's/don'ts.</div></div>
+        <div class="panel"><div class="tag" style="margin-bottom: 16px;">skills / hooks</div><div class="body-md">On-demand procedures compiled in at init.</div></div>
+      </div>
+
+      <div style="margin-top: 56px; padding: 32px 40px; border-left: 6px solid var(--accent); background: var(--canvas-2);">
+        <div class="body-lg">
+          When you read tea leaves about why an agent behaves the way it does, <span class="accent">this is where you look first.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 — Context window is the model's world -->
+  <section data-accent="loop" data-label="11 Context window">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Context window</span><span>11</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">Architecturally stateless</div>
+      <h2 class="title-l" style="max-width: 1700px;">
+        The window is the model's <span class="accent">entire world.</span>
+      </h2>
+      <p class="lede" style="margin-top: 56px; font-size: 40px; max-width: 1600px;">
+        No memory outside it. Every call starts fresh. "Why did it forget X" — it didn't. X wasn't in scope.
+      </p>
+      <div class="mono-note" style="margin-top: 64px; max-width: 1600px;">
+        // The illusion of memory is engineered by re-injecting history, turn by turn.
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 — Tokens, not words -->
+  <section data-accent="loop" data-label="12 Tokens not words">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Tokens</span><span>12</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">How context is measured</div>
+      <h2 class="title-l" style="margin-bottom: 48px;">
+        <span class="accent">Tokens,</span> not words.
+      </h2>
+
+      <div class="cols-2" style="gap: 72px; margin-top: 24px;">
+        <div>
+          <p class="body-lg dim" style="margin-bottom: 36px;">
+            A token is ~3–4 characters of English prose. Denser for code — symbols and keywords pack tighter.
+          </p>
+          <div class="panel">
+            <div class="tag" style="margin-bottom: 16px;">example · prose</div>
+            <div class="mono-note" style="font-size: 24px; line-height: 1.6;">
+              <span style="background: rgba(216,255,58,0.18); padding: 2px 4px;">The</span><span style="background: rgba(255,158,44,0.20); padding: 2px 4px;"> context</span><span style="background: rgba(122,212,255,0.20); padding: 2px 4px;"> window</span><span style="background: rgba(216,255,58,0.18); padding: 2px 4px;"> is</span><span style="background: rgba(255,158,44,0.20); padding: 2px 4px;"> measured</span><span style="background: rgba(122,212,255,0.20); padding: 2px 4px;"> in</span><span style="background: rgba(216,255,58,0.18); padding: 2px 4px;"> tokens</span><span style="background: rgba(255,158,44,0.20); padding: 2px 4px;">.</span>
+            </div>
+            <div class="mono-note" style="margin-top: 16px; font-size: 20px;">
+              8 words → 8 tokens · ≈ 1:1 here
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="body-lg dim" style="margin-bottom: 36px;">
+            Every tool result, every file, every turn has a token price. Compounds across a run.
+          </p>
+          <div class="panel">
+            <div class="tag" style="margin-bottom: 16px;">example · code</div>
+            <div class="mono-note" style="font-size: 22px; line-height: 1.65;">
+              <span style="background: rgba(216,255,58,0.18); padding: 2px 4px;">def</span><span style="background: rgba(255,158,44,0.20); padding: 2px 4px;"> allow</span><span style="background: rgba(122,212,255,0.20); padding: 2px 4px;">(</span><span style="background: rgba(216,255,58,0.18); padding: 2px 4px;">batch</span><span style="background: rgba(255,158,44,0.20); padding: 2px 4px;">)</span><span style="background: rgba(122,212,255,0.20); padding: 2px 4px;">:</span>
+            </div>
+            <div class="mono-note" style="margin-top: 16px; font-size: 20px;">
+              6 tokens · keywords &amp; punctuation pack dense
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mono-note" style="margin-top: 56px;">
+        // Every tool result, every file read, every turn pays a token price. It compounds.
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 — What 128K fits -->
+  <section data-accent="loop" data-label="13 What 128K fits">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · Scale intuition</span><span>13</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">"128K context" feels like a lot. Feel how much.</div>
+      <div class="cols-3" style="gap: 48px; margin-top: 48px;">
+        <div class="panel" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="tag">128,000 tokens</div>
+          <div class="metric-num" style="font-size: 140px;">90K</div>
+          <div class="metric-label">words of prose</div>
+          <div class="body-md dim">About one short novel.</div>
+        </div>
+        <div class="panel" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="tag">128,000 tokens</div>
+          <div class="metric-num" style="font-size: 140px;">~200K</div>
+          <div class="metric-label">lines of source</div>
+          <div class="body-md dim">Roughly a mid-sized service.</div>
+        </div>
+        <div class="panel" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="tag">a single</div>
+          <div class="metric-num" style="font-size: 140px;">30K+</div>
+          <div class="metric-label">tokens, one tool result</div>
+          <div class="body-md dim">A recursive file listing can chew this fast.</div>
+        </div>
+      </div>
+      <div class="mono-note" style="margin-top: 56px;">
+        // Not unlimited. Not even close. Agent runs fill the window faster than you'd expect.
+      </div>
+    </div>
+  </section>
+
+  <!-- Context cost growth -->
+  <section data-accent="loop" data-label="14 Context cost">
+    <div class="chrome-top"><span class="chrome-kicker">1.1 · What context costs</span><span>14</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">Why long agent runs get expensive fast</div>
+      <h2 class="title-m" style="margin-bottom: 48px;">Attention cost grows <span class="accent">quadratically</span> in context length.</h2>
+      <div class="cols-2" style="gap: 72px;">
+        <div>
+          <div class="tag accent" style="margin-bottom: 24px;">the cost shape</div>
+          <div class="body-lg" style="margin-bottom: 24px;">Doubling the context window doesn't double the matrix multiplies per token — it roughly <span class="accent">quadruples</span> them. Self-attention is O(n²) in sequence length.</div>
+          <div class="body-lg dim">In practice: prefix caching, sliding windows, and chunked attention soften this. The shape doesn't change.</div>
+        </div>
+        <div>
+          <div class="tag" style="margin-bottom: 24px;">what this implies</div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="body-lg">A 200K-token turn isn't 6× more expensive than 32K. It's closer to <span class="accent">~40×.</span></div>
+            <div class="body-lg dim">An agent that lets its context grow unbounded is buying a quadratic bill.</div>
+            <div class="body-lg dim">Compaction and trimming aren't UX polish — they're cost control.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mono-note" style="margin-top: 48px;">
+        // We'll see this again in Session 2 when we get to prefill vs decode and prefix caching.
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 — Bridge -->
+  <section data-accent="cold" data-label="15 Bridge">
+    <div class="chrome-top"><span class="chrome-kicker">Midpoint</span><span>15</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">Halfway</div>
+      <h2 class="title-m" style="margin-bottom: 40px; max-width: 1700px;">Pinned so far.</h2>
+      <div class="body-lg" style="max-width: 1600px; margin-bottom: 18px;"><span class="accent">The loop</span> is a dumb while loop.</div>
+      <div class="body-lg" style="max-width: 1600px; margin-bottom: 18px;"><span class="accent">The system prompt</span> is pinned to the top of every turn.</div>
+      <div class="body-lg" style="max-width: 1600px; margin-bottom: 48px;"><span class="accent">The context window</span> is the model's entire world, measured in tokens.</div>
+      <p class="lede" style="font-size: 40px;">
+        Now let's open the hood on the thing that's generating the messages.
+      </p>
+    </div>
+  </section>
+
+  <!-- 17 — Section opener: Inside the model -->
+  <section data-accent="model" class="section-opener" data-label="16 Part 2 opener">
+    <div class="opener-inner">
+      <div class="opener-main">
+        <div style="font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint);">
+          Part 02 · Block 1.2
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom: 40px;">What's inside the model</div>
+          <h2 class="title-xl" style="font-size: 240px;">
+            Inside<br/>the <span class="accent">model</span>.
+          </h2>
+        </div>
+        <div style="font-family: var(--mono); font-size: 22px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase;">
+          Block 1.2
+        </div>
+      </div>
+      <div class="opener-block">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.12em;">02 / 02 BLOCKS</div>
+        <div style="font-family: var(--sans); font-size: 30px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em;">
+          Dense vs MoE. Active vs total. Post-training. Where Gemini sits. The narrow window where LoRA pays off.
+        </div>
+        <div style="font-size: 22px; font-weight: 700;">Block 1.2</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Model-card vocabulary -->
+  <section data-accent="model" data-label="17 Model card vocab">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Reading a model card</span><span>17</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">The vocabulary you'll see on every spec sheet</div>
+      <h2 class="title-m" style="margin-bottom: 32px;">Four numbers, one date.</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="panel" style="padding: 24px 28px;">
+          <div class="tag accent" style="margin-bottom: 10px;">context window</div>
+          <div class="body-md">How many tokens fit in one call. 128K, 200K, 1M. The model's working memory.</div>
+        </div>
+        <div class="panel" style="padding: 24px 28px;">
+          <div class="tag accent" style="margin-bottom: 10px;">total parameters</div>
+          <div class="body-md">Weights on disk. What it costs to host.</div>
+        </div>
+        <div class="panel" style="padding: 24px 28px;">
+          <div class="tag accent" style="margin-bottom: 10px;">active parameters</div>
+          <div class="body-md">Weights that fire per token. What you pay in matrix multiplies. Equal to total only on dense models.</div>
+        </div>
+        <div class="panel" style="padding: 24px 28px;">
+          <div class="tag accent" style="margin-bottom: 10px;">sparsity</div>
+          <div class="body-md">total ÷ active. A 30× ratio means 1 in 30 weights does work per token.</div>
+        </div>
+        <div class="panel" style="padding: 24px 28px; grid-column: span 2;">
+          <div class="tag accent" style="margin-bottom: 10px;">knowledge cutoff</div>
+          <div class="body-md">Last date in pre-training data. Everything after is invisible to the base model — unless you put it in the context window.</div>
+        </div>
+      </div>
+      <div class="mono-note" style="margin-top: 20px;">
+        // We'll unpack each one. Active vs total is where most people's mental model is wrong.
+      </div>
+    </div>
+  </section>
+
+  <!-- 18 — Dense forward pass -->
+  <section data-accent="model" data-label="18 Dense forward pass">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Dense</span><span>18</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">Old mental model · dense forward pass</div>
+      <h2 class="title-m" style="margin-bottom: 56px;">Every parameter participates in <span class="accent">every</span> token.</h2>
+
+      <div style="flex:1; display:flex; align-items:center; justify-content: center;">
+        <svg viewBox="0 0 1400 440" style="width: 100%; max-width: 1400px;">
+          <g font-family="'JetBrains Mono', monospace" font-size="20" fill="#f2efe6">
+            <!-- input -->
+            <rect x="40" y="190" width="180" height="60" fill="none" stroke="#ff9e2c" stroke-width="2"/>
+            <text x="130" y="228" text-anchor="middle" font-family="'Inter Tight', sans-serif" font-weight="700" font-size="26" fill="#ff9e2c">token</text>
+
+            <!-- arrow -->
+            <path d="M 230 220 L 290 220" stroke="#ff9e2c" stroke-width="2" marker-end="url(#arrM)"/>
+            <defs>
+              <marker id="arrM" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#ff9e2c"/>
+              </marker>
+            </defs>
+
+            <!-- Dense block with ALL parameters active -->
+            <rect x="300" y="80" width="780" height="280" fill="#ff9e2c" opacity="0.9"/>
+            <text x="690" y="170" text-anchor="middle" font-family="'Inter Tight', sans-serif" font-weight="800" font-size="56" fill="#141310">ALL PARAMS ACTIVE</text>
+            <text x="690" y="220" text-anchor="middle" font-size="22" fill="#141310" opacity="0.7">every weight multiplied · every token</text>
+            <!-- param dots -->
+            <g fill="#141310" opacity="0.4">
+              <!-- rows of dots -->
+              <text x="690" y="280" text-anchor="middle" font-size="14">■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■</text>
+              <text x="690" y="310" text-anchor="middle" font-size="14">■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■</text>
+              <text x="690" y="340" text-anchor="middle" font-size="14">■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■</text>
+            </g>
+
+            <path d="M 1090 220 L 1150 220" stroke="#ff9e2c" stroke-width="2" marker-end="url(#arrM)"/>
+
+            <!-- output -->
+            <rect x="1160" y="190" width="200" height="60" fill="none" stroke="#ff9e2c" stroke-width="2"/>
+            <text x="1260" y="228" text-anchor="middle" font-family="'Inter Tight', sans-serif" font-weight="700" font-size="26" fill="#ff9e2c">next token</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="mono-note" style="margin-top: 24px;">
+        // 70B dense → every one of those 70B weights multiplied for every token. No sparsity. No routing. No skipping.
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 — MoE forward pass -->
+  <section data-accent="model" data-label="19 MoE forward pass">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Mixture of experts</span><span>19</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">New mental model · MoE forward pass</div>
+      <h2 class="title-m" style="margin-bottom: 40px;">A <span class="accent">router</span> picks top-k experts per token. The rest sit idle.</h2>
+
+      <div style="flex:1; display:flex; align-items:center; justify-content: center;">
+        <svg viewBox="0 0 1600 500" style="width: 100%; max-width: 1600px;">
+          <defs>
+            <marker id="arrM2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="#ff9e2c"/>
+            </marker>
+            <marker id="arrDim" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="#f2efe6" fill-opacity="0.3"/>
+            </marker>
+          </defs>
+          <g font-family="'Inter Tight', sans-serif" font-weight="700" fill="#f2efe6">
+            <!-- Input -->
+            <rect x="40" y="220" width="160" height="60" fill="none" stroke="#ff9e2c" stroke-width="2"/>
+            <text x="120" y="258" text-anchor="middle" font-size="24" fill="#ff9e2c">token</text>
+
+            <path d="M 210 250 L 290 250" stroke="#ff9e2c" stroke-width="2" marker-end="url(#arrM2)"/>
+
+            <!-- Router -->
+            <polygon points="300,210 440,250 300,290" fill="#ff9e2c"/>
+            <text x="345" y="256" text-anchor="middle" font-size="22" fill="#141310" font-family="'JetBrains Mono', monospace">router</text>
+
+            <!-- 8 experts -->
+            <g>
+              <!-- active 1 -->
+              <rect x="520" y="30" width="280" height="100" fill="#ff9e2c"/>
+              <text x="660" y="88" text-anchor="middle" font-size="32" fill="#141310">EXPERT 3</text>
+              <!-- dim 2 -->
+              <rect x="520" y="150" width="280" height="60" fill="#262520" stroke="#f2efe6" stroke-opacity="0.2"/>
+              <text x="660" y="190" text-anchor="middle" font-size="24" fill="#f2efe6" fill-opacity="0.35">expert 1</text>
+              <!-- dim 3 -->
+              <rect x="520" y="225" width="280" height="60" fill="#262520" stroke="#f2efe6" stroke-opacity="0.2"/>
+              <text x="660" y="265" text-anchor="middle" font-size="24" fill="#f2efe6" fill-opacity="0.35">expert 2</text>
+              <!-- active 2 -->
+              <rect x="520" y="300" width="280" height="100" fill="#ff9e2c"/>
+              <text x="660" y="358" text-anchor="middle" font-size="32" fill="#141310">EXPERT 7</text>
+
+              <!-- column 2 - dim -->
+              <rect x="820" y="30" width="280" height="60" fill="#262520" stroke="#f2efe6" stroke-opacity="0.2"/>
+              <text x="960" y="70" text-anchor="middle" font-size="24" fill="#f2efe6" fill-opacity="0.35">expert 4</text>
+              <rect x="820" y="105" width="280" height="60" fill="#262520" stroke="#f2efe6" stroke-opacity="0.2"/>
+              <text x="960" y="145" text-anchor="middle" font-size="24" fill="#f2efe6" fill-opacity="0.35">expert 5</text>
+              <rect x="820" y="180" width="280" height="60" fill="#262520" stroke="#f2efe6" stroke-opacity="0.2"/>
+              <text x="960" y="220" text-anchor="middle" font-size="24" fill="#f2efe6" fill-opacity="0.35">expert 6</text>
+              <rect x="820" y="255" width="280" height="60" fill="#262520" stroke="#f2efe6" stroke-opacity="0.2"/>
+              <text x="960" y="295" text-anchor="middle" font-size="24" fill="#f2efe6" fill-opacity="0.35">expert 8</text>
+            </g>
+
+            <!-- Router arrows: bright to experts 3 and 7, dim to others -->
+            <path d="M 440 240 L 520 80" stroke="#ff9e2c" stroke-width="3" marker-end="url(#arrM2)"/>
+            <path d="M 440 250 L 520 180" stroke="#f2efe6" stroke-opacity="0.15" stroke-width="1"/>
+            <path d="M 440 258 L 520 255" stroke="#f2efe6" stroke-opacity="0.15" stroke-width="1"/>
+            <path d="M 440 260 L 520 350" stroke="#ff9e2c" stroke-width="3" marker-end="url(#arrM2)"/>
+
+            <!-- Aggregate -->
+            <path d="M 800 80 L 1200 240" stroke="#ff9e2c" stroke-width="3" marker-end="url(#arrM2)"/>
+            <path d="M 800 350 L 1200 260" stroke="#ff9e2c" stroke-width="3" marker-end="url(#arrM2)"/>
+
+            <rect x="1200" y="220" width="200" height="60" fill="none" stroke="#ff9e2c" stroke-width="2"/>
+            <text x="1300" y="258" text-anchor="middle" font-size="24" fill="#ff9e2c">combine</text>
+
+            <path d="M 1410 250 L 1480 250" stroke="#ff9e2c" stroke-width="2" marker-end="url(#arrM2)"/>
+            <text x="1550" y="258" text-anchor="middle" font-size="24" fill="#ff9e2c">→</text>
+
+            <!-- Label -->
+            <text x="800" y="460" text-anchor="middle" font-size="22" font-family="'JetBrains Mono', monospace" fill="#f2efe6" opacity="0.55">
+              top-k routing · here k = 2 of 8
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 20 — Two numbers -->
+  <section data-accent="model" data-label="20 Two numbers">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Two numbers</span><span>20</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">Param count</div>
+      <h2 class="title-xl" style="max-width: 1700px; font-size: 200px;">
+        Not one number<br/>
+        <span class="accent">anymore.</span>
+      </h2>
+      <div class="cols-2" style="margin-top: 80px; gap: 120px;">
+        <div>
+          <div class="tag" style="margin-bottom: 20px;">total</div>
+          <div class="body-lg">What's on disk. What you need to host.</div>
+        </div>
+        <div>
+          <div class="tag accent" style="margin-bottom: 20px;">active</div>
+          <div class="body-lg">What fires per token. What you pay in matrix multiplies.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 21 — Active vs total chart -->
+  <section data-accent="model" data-label="21 Active vs total">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Active vs total</span><span>21</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">The shape of the gap</div>
+      <h2 class="title-m" style="margin-bottom: 48px;">Total &gt;&gt; active. Often by <span class="accent">10–30×.</span></h2>
+
+      <div class="panel" style="padding: 0;">
+        <div style="display: flex; justify-content: space-between; padding: 20px 32px; border-bottom: 1px solid var(--ink-rule); font-family: var(--mono); font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint);">
+          <span>active / total parameters (billions, illustrative)</span>
+          <span>shapes seen in the wild</span>
+        </div>
+        <div style="padding: 40px 48px; display: flex; flex-direction: column; gap: 26px;">
+          <div style="display: grid; grid-template-columns: 380px 1fr 220px; gap: 32px; align-items: center;">
+            <div style="font-family: var(--sans); font-size: 28px; font-weight: 600;">Wide MoE</div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 95%; background: rgba(242,239,230,0.12);"></div>
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 5%; background: var(--accent);"></div>
+            </div>
+            <div style="font-family: var(--mono); font-size: 22px; text-align: right;"><span class="accent" style="font-weight:700;">~35B</span><span class="faint"> / ~670B</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 380px 1fr 220px; gap: 32px; align-items: center;">
+            <div style="font-family: var(--sans); font-size: 28px; font-weight: 600;">Large MoE</div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 57%; background: rgba(242,239,230,0.12);"></div>
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 2.5%; background: var(--accent);"></div>
+            </div>
+            <div style="font-family: var(--mono); font-size: 22px; text-align: right;"><span class="accent" style="font-weight:700;">~17B</span><span class="faint"> / ~400B</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 380px 1fr 220px; gap: 32px; align-items: center;">
+            <div style="font-family: var(--sans); font-size: 28px; font-weight: 600;">Mid MoE</div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 20%; background: rgba(242,239,230,0.12);"></div>
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 5.5%; background: var(--accent);"></div>
+            </div>
+            <div style="font-family: var(--mono); font-size: 22px; text-align: right;"><span class="accent" style="font-weight:700;">~40B</span><span class="faint"> / ~140B</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 380px 1fr 220px; gap: 32px; align-items: center;">
+            <div style="font-family: var(--sans); font-size: 28px; font-weight: 600;">Sparse MoE</div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 17%; background: rgba(242,239,230,0.12);"></div>
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 0.7%; background: var(--accent);"></div>
+            </div>
+            <div style="font-family: var(--mono); font-size: 22px; text-align: right;"><span class="accent" style="font-weight:700;">~5B</span><span class="faint"> / ~120B</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 380px 1fr 220px; gap: 32px; align-items: center;">
+            <div style="font-family: var(--sans); font-size: 28px; font-weight: 600;" class="dim">Dense (reference)</div>
+            <div style="position: relative; height: 40px;">
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 10%; background: rgba(242,239,230,0.12);"></div>
+              <div style="position: absolute; left: 0; top: 0; height: 40px; width: 10%; background: rgba(242,239,230,0.35);"></div>
+            </div>
+            <div style="font-family: var(--mono); font-size: 22px; text-align: right;" class="dim"><span style="font-weight:700;">70B</span> / 70B</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 40px; margin-top: 32px; font-family: var(--mono); font-size: 20px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim);">
+        <span><span style="display:inline-block;width:16px;height:16px;background:var(--accent);margin-right:10px;vertical-align:middle;"></span>Active per token</span>
+        <span><span style="display:inline-block;width:16px;height:16px;background:rgba(242,239,230,0.12);margin-right:10px;vertical-align:middle;"></span>Total parameters</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frontier is MoE -->
+  <section data-accent="model" data-label="22 Frontier is MoE">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Where Gemini sits</span><span>22</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">The model on the other end of Jetski</div>
+      <h2 class="title-l" style="max-width: 1700px; margin-bottom: 56px;">
+        Every frontier lab ships <span class="accent">MoE.</span>
+      </h2>
+      <div class="cols-3" style="gap: 32px; margin-top: 16px;">
+        <div class="panel" style="padding: 36px 40px; display:flex; flex-direction: column; gap: 14px;">
+          <div class="tag accent">Google</div>
+          <div style="font-family: var(--sans); font-size: 38px; font-weight: 700; letter-spacing: -0.01em;">Gemini</div>
+          <div class="body-md dim">Sparse MoE since 1.5. Active/total split not published.</div>
+        </div>
+        <div class="panel" style="padding: 36px 40px; display:flex; flex-direction: column; gap: 14px;">
+          <div class="tag accent">OpenAI</div>
+          <div style="font-family: var(--sans); font-size: 38px; font-weight: 700; letter-spacing: -0.01em;">GPT-4 class</div>
+          <div class="body-md dim">Widely reported MoE. OpenAI hasn't confirmed the topology.</div>
+        </div>
+        <div class="panel" style="padding: 36px 40px; display:flex; flex-direction: column; gap: 14px;">
+          <div class="tag accent">Open weights</div>
+          <div style="font-family: var(--sans); font-size: 38px; font-weight: 700; letter-spacing: -0.01em;">Mixtral · DeepSeek · Qwen</div>
+          <div class="body-md dim">All MoE. Active/total numbers public.</div>
+        </div>
+      </div>
+      <div class="mono-note" style="margin-top: 48px; max-width: 1700px;">
+        // The dense-model intuition you've been carrying around — it's a generation behind the production frontier.
+      </div>
+    </div>
+  </section>
+
+  <!-- 23 — Committee intuition -->
+  <section data-accent="model" data-label="23 Committee intuition">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · New intuition</span><span>23</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">What MoE implies about how it "thinks"</div>
+      <h2 class="title-l" style="max-width: 1700px;">
+        Not one big brain.<br/>
+        <span class="accent">A committee of specialists.</span>
+      </h2>
+      <p class="lede" style="margin-top: 56px; font-size: 40px; max-width: 1600px;">
+        The router learned, during training, which experts to consult for which kind of token. Some specialize in code. Some in dialog. Some in math.
+      </p>
+      <div class="mono-note" style="margin-top: 56px; max-width: 1600px;">
+        // Hard interdisciplinary question → multiple experts consulted → answer stitched across their outputs.
+      </div>
+    </div>
+  </section>
+
+  <!-- Post-training: what it changes -->
+  <section data-accent="model" data-label="24 Post-training changes">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Post-training</span><span>24</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">RLHF · RLAIF · instruction tuning</div>
+      <h2 class="title-m" style="margin-bottom: 40px;">Post-training shapes <span class="accent">behavior,</span> not knowledge.</h2>
+      <div class="cols-2" style="gap: 72px; margin-top: 8px;">
+        <div class="panel" style="padding: 40px 44px; border-color: var(--accent);">
+          <div class="tag accent" style="margin-bottom: 24px;">What it can change</div>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="body-lg">Tone, voice, refusal posture</div>
+            <div class="body-lg">Format adherence (JSON, Markdown, tables)</div>
+            <div class="body-lg">Tool-call discipline</div>
+            <div class="body-lg">Response length, hedging</div>
+          </div>
+        </div>
+        <div class="panel" style="padding: 40px 44px;">
+          <div class="tag" style="margin-bottom: 24px;">What it can't (reliably) change</div>
+          <div style="display: flex; flex-direction: column; gap: 18px;" class="dim">
+            <div class="body-lg">New factual knowledge</div>
+            <div class="body-lg">The reasoning ceiling</div>
+            <div class="body-lg">Core capabilities set by pre-training</div>
+            <div class="body-lg">World-model depth</div>
+          </div>
+        </div>
+      </div>
+      <div class="mono-note" style="margin-top: 32px; max-width: 1700px;">
+        // "Fine-tune it on our runbooks" is the wrong tool. Wrong layer. That's a context-window problem — retrieval, not training.
+      </div>
+    </div>
+  </section>
+
+  <!-- Hosted coding agents -->
+  <section data-accent="model" data-label="25 Hosted agents">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · Hosted coding agents</span><span>25</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">Antigravity · AI Studio · Claude Code</div>
+      <h2 class="title-l" style="max-width: 1700px;">
+        Surfaces over <span class="accent">an inference service.</span>
+      </h2>
+      <p class="lede" style="margin-top: 48px; font-size: 40px; max-width: 1600px;">
+        The weights aren't yours. The provider upgrades the model underneath you — sometimes on a timeline you don't control.
+      </p>
+      <div class="mono-note" style="margin-top: 56px; max-width: 1600px;">
+        // The agent you're talking to in April isn't the same product in October — even if the URL doesn't change.
+      </div>
+    </div>
+  </section>
+
+  <!-- Rent not capex -->
+  <section data-accent="model" data-label="26 Rent not capex">
+    <div class="chrome-top"><span class="chrome-kicker">1.2 · What this means for you</span><span>26</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body" style="justify-content: center;">
+      <div class="eyebrow">For Gemini + Jetski day-to-day</div>
+      <h2 class="title-xl" style="max-width: 1700px; font-size: 180px;">
+        The thing on the other end has a<br/>
+        <span class="accent">three-month half-life.</span>
+      </h2>
+      <p class="lede" style="margin-top: 64px; font-size: 38px; max-width: 1600px;">
+        Watch what's actually deployed. Notice when behavior drifts. Have a fallback when something changes underneath you.
+      </p>
+      <div class="mono-note" style="margin-top: 48px; max-width: 1600px;">
+        // Operational instincts that already work — they carry over directly.
+      </div>
+    </div>
+  </section>
+
+  <!-- 27 — Reframes earned -->
+  <section data-accent="cold" data-label="27 Reframes earned">
+    <div class="chrome-top"><span class="chrome-kicker">Wrap</span><span>27</span></div>
+    <div class="chrome-bot"><span>Life of an Agent · S1</span><span>—</span></div>
+    <div class="body">
+      <div class="eyebrow">Recap</div>
+      <h2 class="title-m" style="margin-bottom: 64px;">If you remember four things.</h2>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr; gap: 24px 40px; align-items: baseline;">
+        <div style="font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700;">01</div>
+        <div class="body-lg"><span style="font-weight:700;">The loop</span> is a dumb while loop. All the smarts are in the model call.</div>
+
+        <div style="font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700;">02</div>
+        <div class="body-lg"><span style="font-weight:700;">The system prompt</span> is a compiled, re-injected instruction surface — most of your operational leverage lives there.</div>
+
+        <div style="font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700;">03</div>
+        <div class="body-lg"><span style="font-weight:700;">Model size</span> is two numbers now. Active and total can diverge by 10–30×. Gemini is MoE.</div>
+
+        <div style="font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700;">04</div>
+        <div class="body-lg"><span style="font-weight:700;">"Teach it our stuff"</span> is almost always RAG, not fine-tune. Post-training is a behavior knob, not a knowledge knob.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 28 — Next week + Q&A -->
+  <section data-accent="cold" class="section-opener" data-label="28 Next + Q and A">
+    <div class="opener-inner">
+      <div class="opener-main">
+        <div style="font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint);">
+          Fin · Session 01
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom: 40px;">Next week</div>
+          <h2 class="title-xl" style="font-size: 200px;">
+            Extending<br/>
+            the <span class="accent">agent.</span>
+          </h2>
+          <p class="lede" style="margin-top: 48px; font-size: 38px; max-width: 1400px;">
+            Tools · MCP · skills · sub-agents — then prefill vs decode and prefix caching as cloud-provider economics.
+          </p>
+        </div>
+        <div style="font-family: var(--mono); font-size: 22px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase;">
+          Session 02 of 03 · same time · same place
+        </div>
+      </div>
+      <div class="opener-block">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.12em;">Q &amp; A</div>
+        <div>
+          <div style="font-family: var(--sans); font-weight: 800; font-size: 140px; line-height: 0.9; letter-spacing: -0.04em;">
+            Floor's<br/>yours.
+          </div>
+        </div>
+        <div style="font-size: 22px; font-weight: 700;">~15 min · or longer</div>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>

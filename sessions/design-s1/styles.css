@@ -1,0 +1,271 @@
+/* Life of an Agent — Session 1
+ * Bold graphic direction. Warm charcoal canvas, massive display type,
+ * per-section accent hue. All sizes in px tuned for 1920×1080.
+ */
+
+/* Fonts loaded from google in the HTML */
+
+:root {
+  --ink:        #f2efe6;
+  --ink-dim:    rgba(242, 239, 230, 0.62);
+  --ink-faint:  rgba(242, 239, 230, 0.38);
+  --ink-rule:   rgba(242, 239, 230, 0.14);
+  --ink-panel:  rgba(242, 239, 230, 0.05);
+
+  --canvas:     #141310;
+  --canvas-2:   #1c1b17;
+  --canvas-3:   #262520;
+
+  /* Section accents — same chroma/lightness ish, different hue */
+  --accent-loop:    #d8ff3a;   /* 1.1 The loop — electric lime */
+  --accent-model:   #ff9e2c;   /* 1.2 Inside the model — molten amber */
+  --accent-cold:    #7ad4ff;   /* cold open + close — ice blue */
+  --accent-warn:    #ff6b4a;   /* callouts — coral */
+
+  --accent:     var(--accent-loop);      /* current section accent — override per slide */
+  --ink-accent: #141310;                 /* text color when placed on an accent block */
+
+  --sans: 'Inter Tight', 'Inter', 'Helvetica Neue', sans-serif;
+  --sans-body: 'Inter', 'Helvetica Neue', sans-serif;
+  --mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
+
+deck-stage { background: #0a0a08; }
+
+section {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--sans-body);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Per-section accent overrides */
+section[data-accent="loop"]  { --accent: var(--accent-loop);  }
+section[data-accent="model"] { --accent: var(--accent-model); }
+section[data-accent="cold"]  { --accent: var(--accent-cold);  }
+
+/* ─── Shared slide chrome: top + bottom strips ─── */
+
+.chrome-top,
+.chrome-bot {
+  position: absolute;
+  left: 0; right: 0;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 64px;
+  font-family: var(--mono);
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.chrome-top { top: 0; border-bottom: 1px solid var(--ink-rule); }
+.chrome-bot { bottom: 0; border-top: 1px solid var(--ink-rule); }
+
+.chrome-kicker {
+  display: flex; align-items: center; gap: 18px;
+}
+.chrome-kicker::before {
+  content: '';
+  display: inline-block;
+  width: 14px; height: 14px;
+  background: var(--accent);
+}
+
+/* ─── Slide body container (respects chrome padding) ─── */
+
+.body {
+  position: absolute;
+  top: 64px;
+  bottom: 64px;
+  left: 96px;
+  right: 96px;
+  display: flex;
+  flex-direction: column;
+  padding: 72px 0 56px;
+}
+.body.no-chrome { top: 0; bottom: 0; padding: 120px 0; }
+.body.tight { padding-top: 56px; padding-bottom: 48px; }
+
+/* ─── Typography primitives ─── */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 20px;
+}
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 40px; height: 2px;
+  background: var(--accent);
+}
+.eyebrow.plain::before { display: none; }
+
+.title-xl {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 168px;
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  margin: 0;
+  color: var(--ink);
+}
+.title-l {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 120px;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin: 0;
+}
+.title-m {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 80px;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.title-s {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.lede {
+  font-family: var(--sans-body);
+  font-weight: 400;
+  font-size: 38px;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  color: var(--ink-dim);
+  max-width: 1500px;
+}
+
+.body-lg {
+  font-family: var(--sans-body);
+  font-size: 32px;
+  line-height: 1.38;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+.body-md {
+  font-size: 28px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.mono-note {
+  font-family: var(--mono);
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: var(--ink-dim);
+  line-height: 1.45;
+}
+
+.accent { color: var(--accent); }
+.dim { color: var(--ink-dim); }
+.faint { color: var(--ink-faint); }
+
+/* ─── Panels / cards ─── */
+
+.panel {
+  background: var(--canvas-2);
+  border: 1px solid var(--ink-rule);
+  padding: 32px 36px;
+}
+.panel-dk {
+  background: var(--canvas);
+  border: 1px solid var(--ink-rule);
+  padding: 32px 36px;
+}
+
+.hrule { height: 1px; background: var(--ink-rule); width: 100%; }
+
+/* Tag / chip */
+.tag {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono);
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: var(--ink-panel);
+  border: 1px solid var(--ink-rule);
+  color: var(--ink-dim);
+}
+.tag.accent { color: var(--ink-accent); background: var(--accent); border-color: transparent; font-weight: 600; }
+
+/* Section opener: full accent block */
+section.section-opener {
+  background: var(--canvas);
+}
+.opener-inner {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: 1fr 640px;
+}
+.opener-main {
+  padding: 120px 96px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.opener-block {
+  background: var(--accent);
+  color: var(--ink-accent);
+  padding: 120px 72px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-family: var(--mono);
+}
+
+/* Keyword highlight inline */
+.kw {
+  color: var(--accent);
+  font-weight: inherit;
+}
+
+/* Code-like inline token */
+.tok {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: var(--ink-panel);
+  border: 1px solid var(--ink-rule);
+  padding: 2px 10px;
+  color: var(--ink);
+}
+
+/* Two-column helper */
+.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; }
+.cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+
+/* Big metric */
+.metric {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.metric-num {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 180px;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+.metric-label {
+  font-family: var(--mono);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* Print-friendly: deck-stage handles this, but ensure section background */
+@media print {
+  section { background: var(--canvas) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
