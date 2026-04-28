@@ -117,3 +117,21 @@ Running record of decisions made during production. New entries at the bottom. E
 - The course succeeds if attendees (a) **learn at least one thing they didn't know**, (b) get **curious about something they didn't even know existed**, and (c) leave with **stuff they already knew reframed in a more useful way**. It does *not* need to leave them able to pass a quiz on the material.
 - **Why:** the audience is 12 SREs Bryan knows well, with one 45-min session each. Optimizing for comprehensive coverage / retention would force shallow treatment of every topic; optimizing for insight + curiosity + reframing lets each section go deep enough to land. Bryan is also explicit that he prefers trimming over padding — better to draft long with strong material and cut, than draft tight and pad.
 - **How to apply:** when judging whether a section earns its time, ask "does this drop a real insight, spark a curiosity hook, or reframe something they already think they know?" If none of the three, cut it. Don't add "completeness" content (e.g. obligatory definitions, exhaustive enumerations) just because the topic technically warrants it. Draft generously; trim aggressively.
+
+---
+
+## 2026-04-27 — S1 review corrections
+
+### D15. Voice, audience starting point, and environment constraints for Claude Design
+
+After reviewing the S1 draft from Claude Design, four corrections are locked in for all subsequent sessions:
+
+**Voice:** Small room, not conference stage. 12 SREs Bryan knows personally. Direct and collegial — no rhetorical buildup, no dramatic reveals, no "at the end of this session you will…" preamble. Just the material.
+
+**Design scaffolding stays hidden:** The "one thing learned / curious / reframed" success criteria are a design lens, not an agenda item. Never surfaces on a slide. The session opener is not a meta-description of the session.
+
+**Audience starts cold:** They don't know MoE, the open-weight model ecosystem, or any AI/ML vocabulary. Every term earns its first use. Comparison and landscape slides orient around what's functionally relevant to them — not around naming the full model family tree.
+
+**Constrained environment:** This audience uses Gemini variants + the internal Jetski harness (Jetski, Jetski CLI, Jetski Chat). They don't pick models or make capex decisions. Nothing should be framed around model selection, capex vs. opex, or "which model should you use." The useful frame is: here's the landscape and why it's structured this way, here's what that means for using the tools you have.
+
+- **How to apply:** DESIGN_HANDOFF.md now carries "Voice and tone," "Audience's actual starting point," and "Constrained environment" sections that encode these constraints directly. Any revision pass on Design output should check against those sections.

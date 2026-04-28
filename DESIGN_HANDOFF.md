@@ -29,6 +29,32 @@ For each block:
 
 **Speaker notes** — per slide, 2–4 sentences. What to say that isn't on the slide; what to watch for in the audience's reaction; where to invite questions.
 
+## Voice and tone
+
+**Register: small room, not stage.** The audience is 12 SREs Bryan knows personally. Write the way you'd explain something to colleagues over lunch — direct, a little relaxed, no performance. Not: "And that's the key insight. Let that sink in." Yes: "The thing that trips people up here is X."
+
+No rhetorical buildup, no dramatic reveals, no "at the end of this session you will…" preamble. Just start talking about the thing.
+
+**Don't surface the design scaffolding.** The success criteria (one thing learned, one thing curious, one thing reframed) are a *lens for evaluating content*, not an agenda item on any slide. The session opener is not "here's the structure of what you'll get from today." It's just the first substantive thing.
+
+**Don't carry over planning artifacts.** Notes like "worth flagging…Gemini is MoE. Confirmed." were research notes from content production — they don't belong in attendee-facing material. The audience isn't coming in with a prior frame on MoE; they want to understand model architectures, what Google uses, and why that choice was made. Start from where they are, not from where the research conversation was.
+
+## Audience's actual starting point
+
+These SREs know distributed systems deeply. They do not know:
+
+- What MoE (mixture of experts) is — explain it from scratch if it comes up
+- The open-weight model ecosystem — names like Llama, Mistral, Falcon, etc. won't land without context; don't assume they will on a comparison slide
+- Any AI/ML vocabulary — every term needs to earn its first use
+
+When building comparison slides or landscape slides, orient around what's *functionally relevant to them*, not around naming the full model family tree.
+
+## Constrained environment (important)
+
+This audience doesn't choose their models or their tooling. They use **Gemini variants** (what's available to them at work) and the **harnesses Google provides internally** — Jetski, Jetski CLI, Jetski Chat. They don't make capex decisions, they don't pick between open-weight models, they don't evaluate model vendors.
+
+**Do not frame anything around model selection, capex vs. opex tradeoffs, or "which model should you use."** That's not a choice they have. The useful framing is: here's the landscape and why it's structured this way, here's what that means for how you use the tools you've been given.
+
 ## Constraints
 
 - Static visualizations only — no interactive demos, no iframes.
